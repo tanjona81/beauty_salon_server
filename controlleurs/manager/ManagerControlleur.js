@@ -1,7 +1,26 @@
 const uri = require('../../config/DbConfig.js')
 const mongoose = require('mongoose');
 const service = require('../../services/manager/ManagerServices.js')
-const express = require('express');
+
+const loginManager = () => {
+    return(async (req,res)=>{
+        try{
+            await mongoose.connect(uri)
+            await service.login(req.query.nom, req.query.mdp)
+            .then((result)=>{
+                if(!result) return res.status(204).send('No match for the request')
+                return res.status(200).json(result)
+                
+            })
+            .catch((err) => {
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')
+            });
+        }finally{
+            await mongoose.disconnect()
+        }
+    })
+}
 
 const getManager = () => {
     return(async (req,res)=>{
@@ -104,5 +123,6 @@ module.exports = {
     getManagerById,
     createManager,
     updateManager,
-    deleteManager
+    deleteManager,
+    loginManager
 }
