@@ -87,7 +87,7 @@ const deleteManager = () => {
             await mongoose.connect(uri)
             await service.delete_manager(req.params.id)
             .then((result)=>{
-                return res.status(201).json("Manager updated")
+                return res.status(200).json("Manager updated")
             })
             .catch((err) => {
                 console.log("Error : "+err.message)
