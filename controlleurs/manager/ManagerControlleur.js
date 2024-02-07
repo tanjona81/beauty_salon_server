@@ -1,4 +1,4 @@
-// const db = require('../../config/DbConfig.js')
+const uri = require('../../config/DbConfig.js')
 const mongoose = require('mongoose');
 const service = require('../../services/manager/ManagerServices.js')
 const express = require('express');
@@ -6,10 +6,10 @@ const express = require('express');
 const getManager = () => {
     return(async (req,res)=>{
         try{
-            service.getAll()
+            await mongoose.connect(uri)
+            await service.getAll()
             .then((result)=>{
                 if(result.length<=0) return res.status(204).send('No match for the request')
-                // console.log(result.length);
                 return res.status(200).json(result)
                 
             })
@@ -18,6 +18,7 @@ const getManager = () => {
                 return res.status(500).send('Internal server error')
             });
         }finally{
+            await mongoose.disconnect()
         }
     })
 }
@@ -25,9 +26,9 @@ const getManager = () => {
 const getManagerById = () => {
     return(async (req,res)=>{
         try{
-            service.getById(req.params.id)
+            await mongoose.connect(uri)
+            await service.getById(req.params.id)
             .then((result)=>{
-                // if(!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(204).send('No match for the request')
                 if(!result) return res.status(204).send('No match for the request')
                 return res.status(200).json(result)
                 
@@ -37,81 +38,63 @@ const getManagerById = () => {
                 return res.status(500).send('Internal server error')
             });
         }finally{
-            // client.release()
+            await mongoose.disconnect()
         }
     })
 }
 
 const createManager = () => {
     return (async (req,res)=>{
-        // const session = await mongoose.startSession()
-        // session.startTransaction()
         try{
+            await mongoose.connect(uri)
             const {nom,mdp} = req.body;
-            service.create(nom, mdp)
+            await service.create(nom, mdp)
             .then((result)=>{
-                // session.commitTransaction().then(()=>{
-                    return res.status(201).json("Manager saved")
-                // })
+                return res.status(201).json("Manager saved")
             })
             .catch((err) => {
-                // session.abortTransaction().then(()=>{
-                    console.log("Error : "+err.message)
-                    return res.status(500).send('Internal server error')
-                // })
-                
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')                
             });
         }finally{
-            // session.endSession();
+            await mongoose.disconnect()
         }
     })
 }
 
 const updateManager = () => {
     return (async (req,res)=>{
-        // const session = mongoose.startSession()
-        // await session.startTransaction()
         try{
+            await mongoose.connect(uri)
             const {nom,mdp} = req.body;
-            service.update(nom, mdp)
+            await service.update(req.params.id, nom, mdp)
             .then((result)=>{
-                // session.commitTransaction().then(()=>{
-                    return res.status(201).json("Manager updated")
-                // })
+                return res.status(200).json("Manager updated")
             })
             .catch((err) => {
-                // session.abortTransaction().then(()=>{
-                    console.log("Error : "+err.message)
-                    return res.status(500).send('Internal server error')
-                // })
-                
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')
             });
         }finally{
-            // session.endSession();
+            await mongoose.disconnect()
         }
     })
 }
 
 const deleteManager = () => {
     return (async (req,res)=>{
-        // const session = mongoose.startSession()
-        // await session.startTransaction()
         try{
-            service.delete_manager(req.params.id)
+            await mongoose.connect(uri)
+            await service.delete_manager(req.params.id)
             .then((result)=>{
-                // session.commitTransaction().then(()=>{
-                    return res.status(201).json("Manager updated")
-                // })
+                return res.status(201).json("Manager updated")
             })
             .catch((err) => {
-                // session.abortTransaction().then(()=>{
-                    console.log("Error : "+err.message)
-                    return res.status(500).send('Internal server error')
-                // })
-                
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')                
             });
         }finally{
-            // session.endSession();
+            await mongoose.disconnect()
         }
     })
 }
