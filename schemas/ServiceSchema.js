@@ -5,8 +5,20 @@ const serviceSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    prix: {
+        type: Number,
+        min: 1,
+        required: true
+    },
     duree: {
-        type: String,
+        type: Number,
+        min: 1,
+        required: true
+    },
+    commission: {
+        type: Number,
+        min: 1,
+        max: 100,
         required: true
     },
     created_at: {

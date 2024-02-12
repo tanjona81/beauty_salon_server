@@ -1,12 +1,12 @@
 const uri = require('../../config/DbConfig.js')
 const mongoose = require('mongoose');
-const service = require('../../services/manager/ManagerServices.js')
+const service = require('../../services/employe/EmployeServices.js')
 
-const loginManager = () => {
+const loginEmploye = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            await service.login(req.query.nom, req.query.mdp)
+            await service.login(req.query.email, req.query.mdp)
             .then((result)=>{
                 if(!result) return res.status(401).send('No match for the request')
                 return res.status(200).json(result)
@@ -26,7 +26,7 @@ const loginManager = () => {
     })
 }
 
-const getManager = () => {
+const getEmploye = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
@@ -50,7 +50,7 @@ const getManager = () => {
     })
 }
 
-const getManagerById = () => {
+const getEmployeById = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
@@ -74,12 +74,12 @@ const getManagerById = () => {
     })
 }
 
-const createManager = () => {
+const createEmploye = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            const {nom,mdp} = req.body;
-            await service.create(nom, mdp)
+            const {image, nom, prenom, tel, email, addresse, mdp, heure_debut, heure_fin} = req.body;
+            await service.create(image, nom, prenom, tel, email, addresse, mdp, heure_debut, heure_fin)
             .then((result)=>{
                 return res.status(201).json(result)
             })
@@ -97,12 +97,12 @@ const createManager = () => {
     })
 }
 
-const updateManager = () => {
+const updateEmploye = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            const {nom,mdp} = req.body;
-            await service.update(req.params.id, nom, mdp)
+            const {image, nom, prenom, tel, email, addresse, mdp, heure_debut, heure_fin} = req.body;
+            await service.update(req.params.id, image, nom, prenom, tel, email, addresse, mdp, heure_debut, heure_fin)
             .then((result)=>{
                 return res.status(200).json(result)
             })
@@ -120,13 +120,13 @@ const updateManager = () => {
     })
 }
 
-const deleteManager = () => {
+const deleteEmploye = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            await service.delete_manager(req.params.id)
+            await service.delete_employe(req.params.id)
             .then((result)=>{
-                return res.status(204).json("Manager deleted")
+                return res.status(204).json("Employe deleted")
             })
             .catch((err) => {
                 console.log("Error : "+err.message)
@@ -143,10 +143,10 @@ const deleteManager = () => {
 }
 
 module.exports = {
-    getManager,
-    getManagerById,
-    createManager,
-    updateManager,
-    deleteManager,
-    loginManager
+    getEmploye,
+    getEmployeById,
+    createEmploye,
+    updateEmploye,
+    deleteEmploye,
+    loginEmploye
 }

@@ -1,32 +1,8 @@
 const uri = require('../../config/DbConfig.js')
 const mongoose = require('mongoose');
-const service = require('../../services/manager/ManagerServices.js')
+const service = require('../../services/rendezvous/RendezvousServices.js')
 
-const loginManager = () => {
-    return(async (req,res)=>{
-        try{
-            // await mongoose.connect(uri)
-            await service.login(req.query.nom, req.query.mdp)
-            .then((result)=>{
-                if(!result) return res.status(401).send('No match for the request')
-                return res.status(200).json(result)
-                
-            })
-            .catch((err) => {
-                console.log("Error : "+err.message)
-                return res.status(500).send('Internal server error')
-            });
-        }catch(e){
-            console.log("Error : "+e.message)
-            // await mongoose.disconnect()
-            return res.status(500).send('Internal server error')
-        }finally{
-            // await mongoose.disconnect()
-        }
-    })
-}
-
-const getManager = () => {
+const getRendezvous = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
@@ -50,7 +26,7 @@ const getManager = () => {
     })
 }
 
-const getManagerById = () => {
+const getRendezvousById = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
@@ -74,12 +50,12 @@ const getManagerById = () => {
     })
 }
 
-const createManager = () => {
+const createRendezvous = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            const {nom,mdp} = req.body;
-            await service.create(nom, mdp)
+            const {id_customer, id_service, id_employe, date_heure} = req.body;
+            await service.create(id_customer, id_service, id_employe, date_heure)
             .then((result)=>{
                 return res.status(201).json(result)
             })
@@ -97,12 +73,12 @@ const createManager = () => {
     })
 }
 
-const updateManager = () => {
+const updateRendezvous = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            const {nom,mdp} = req.body;
-            await service.update(req.params.id, nom, mdp)
+            const {id_customer, id_service, id_employe, date_heure, is_valid} = req.body;
+            await service.update(req.params.id, id_customer, id_service, id_employe, date_heure, is_valid)
             .then((result)=>{
                 return res.status(200).json(result)
             })
@@ -120,13 +96,13 @@ const updateManager = () => {
     })
 }
 
-const deleteManager = () => {
+const deleteRendezvous = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            await service.delete_manager(req.params.id)
+            await service.delete_rendezvous(req.params.id)
             .then((result)=>{
-                return res.status(204).json("Manager deleted")
+                return res.status(204).json("Rendezvous deleted")
             })
             .catch((err) => {
                 console.log("Error : "+err.message)
@@ -143,10 +119,9 @@ const deleteManager = () => {
 }
 
 module.exports = {
-    getManager,
-    getManagerById,
-    createManager,
-    updateManager,
-    deleteManager,
-    loginManager
+    getRendezvous,
+    getRendezvousById,
+    createRendezvous,
+    updateRendezvous,
+    deleteRendezvous
 }
