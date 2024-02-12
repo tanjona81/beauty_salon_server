@@ -1,4 +1,6 @@
 const Employe = require('../../schemas/EmployeSchema.js')
+const Rendezvous = require('../../schemas/RendezvousSchema.js')
+const RendezvousServices = require('../rendezvous/RendezvousServices.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 
@@ -71,11 +73,40 @@ const delete_employe = async (id) => {
     return await Employe.deleteOne({ _id : id });
 }
 
+const getRendezvous = async (id_employe) => {
+    return await Rendezvous.where("id_employe")
+                        .equals(id_employe)
+                        .where("is_valid")
+                        .equals(0)
+                        .populate("id_service")
+                        .populate("id_customer")
+}
+
+const getDoneRendezvous = async (id_employe) => {
+    return await Rendezvous.where("id_employe")
+                        .equals(id_employe)
+                        .where("is_valid")
+                        .equals(1)
+                        .populate("id_service")
+                        .populate("id_customer")
+}
+
+const validate_rendezvous = async (id_rendezvous) => {
+    return await RendezvousServices.update(id_rendezvous,undefined,undefined,undefined,undefined,1)
+}
+
+const commission_per_day = async (id_employe) => {
+    
+}
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
     delete_employe,
-    login
+    login,
+    getRendezvous,
+    getDoneRendezvous,
+    validate_rendezvous
 }

@@ -3,8 +3,12 @@ const router = express.Router();
 const controlleur = require('../../controlleurs/employe/EmployeControlleur.js')
 
 router.get('/',controlleur.getEmploye())
-router.get('/login',controlleur.loginEmploye())
 router.post('/',controlleur.createEmploye())
+
+router.get('/login',controlleur.loginEmploye())
+router.get('/rendezvous/:id',controlleur.getRendezvousEmploye())
+router.get('/rendezvousdone/:id',controlleur.getDoneRendezvousEmploye())
+router.put('/rendezvousvalidate/:id',controlleur.validate_rendezvous())
 
 router.route('/:id')
     .get(controlleur.getEmployeById())
