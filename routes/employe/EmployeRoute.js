@@ -9,6 +9,7 @@ router.get('/login',controlleur.loginEmploye())
 router.get('/rendezvous/:id',controlleur.getRendezvousEmploye())
 router.get('/rendezvousdone/:id',controlleur.getDoneRendezvousEmploye())
 router.put('/rendezvousvalidate/:id',controlleur.validate_rendezvous())
+router.get('/commission/:id',controlleur.getCommission())
 
 router.route('/:id')
     .get(controlleur.getEmployeById())

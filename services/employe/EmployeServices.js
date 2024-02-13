@@ -3,6 +3,7 @@ const Rendezvous = require('../../schemas/RendezvousSchema.js')
 const RendezvousServices = require('../rendezvous/RendezvousServices.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 
 const login = async (email, mdp) => {
     const user = await Employe.findOne({email:email})
@@ -96,7 +97,50 @@ const validate_rendezvous = async (id_rendezvous) => {
 }
 
 const commission_per_day = async (id_employe) => {
-    
+    const currentDate = new Date();
+    const formattedCurrentDate = currentDate.toISOString().slice(0, 10); // Get the current date in YYYY-MM-DD format
+
+    const _id_employe = new mongoose.Types.ObjectId(id_employe);
+    return await Rendezvous.aggregate([
+        {
+            $match:{
+                id_employe: _id_employe,
+                is_valid: 1,
+                $expr: {
+                    $eq: [
+                        { $dateToString: { format: "%Y-%m-%d", date: "$date_heure" } },
+                        formattedCurrentDate
+                    ]
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: 'services',
+                localField: 'id_service',
+                foreignField: '_id',
+                as: 'service'
+            }
+        },
+        {
+            $unwind: { path: "$service" }
+        },
+        {
+            $group: {
+               _id: { id_employe: "$id_employe", date: formattedCurrentDate },
+               total: { $sum: { $multiply: ["$service.prix", { $divide: ["$service.commission", 100] }] } }
+            // total: { $sum: "$service.prix" }
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                id_employe: "$_id.id_employe",
+                date: "$_id.date",
+                total: 1
+            }
+        }
+    ])
 }
 
 module.exports = {
@@ -108,5 +152,6 @@ module.exports = {
     login,
     getRendezvous,
     getDoneRendezvous,
-    validate_rendezvous
+    validate_rendezvous,
+    commission_per_day
 }
