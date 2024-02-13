@@ -60,7 +60,7 @@ const create = async (id_customer, id_service, id_employe, date_heure) =>  {
             }
         }
     ])
-    console.log(rendezvous_valid)
+    // console.log(rendezvous_valid)
     for(let i=0;i<rendezvous_valid.length;i++){
         let rendezvousdate_plus_duree = new Date(rendezvous_valid[i].date_heure.getTime() + rendezvous_valid[i].service.duree * 60000)
         // console.log(rendezvous_valid[i].date_heure.getTime())
