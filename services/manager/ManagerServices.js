@@ -114,6 +114,134 @@ const nbrReservation_mois = async () => {
     ])
 }
 
+const chiffreAffaire_jour = async () => {
+    return await Rendezvous.aggregate([
+        {
+            $match: {
+                is_valid: 1
+            }
+        },
+        {
+            $lookup: {
+                from: 'services',
+                localField: 'id_service',
+                foreignField: '_id',
+                as: 'service'
+            }
+        },
+        {
+            $unwind: { path: "$service" }
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$date_heure" } },
+                chiffre: {
+                    $sum: "$service.prix"
+                }
+                // chiffre: { 
+                //     $sum: { 
+                //         $subtract: [
+                //             "$service.prix", 
+                //             {
+                //                 $multiply: [
+                //                     "$service.prix", 
+                //                     { 
+                //                         $divide: [
+                //                         "$service.commission", 
+                //                         100
+                //                         ] 
+                //                     }
+                //                 ]
+                //             }
+                //         ]
+                //     } 
+                // }
+            }
+        }
+    ])
+}
+
+const chiffreAffaire_mois = async () => {
+    return await Rendezvous.aggregate([
+        {
+            $match: {
+                is_valid: 1
+            }
+        },
+        {
+            $lookup: {
+                from: 'services',
+                localField: 'id_service',
+                foreignField: '_id',
+                as: 'service'
+            }
+        },
+        {
+            $unwind: { path: "$service" }
+        },
+        {
+            $group: {
+                _id: { year: { $year: '$date_heure' }, month: { $month: '$date_heure' } },
+                chiffre: {
+                    $sum: "$service.prix"
+                }
+                // chiffre: { $sum: { $subtract: ["$service.prix", {$multiply: ["$service.prix", { $divide: ["$service.commission", 100] }] }]} }
+            }
+        }
+    ])
+}
+
+const beneficeparmois = async (mois, loyer, piece, autres) => {
+    mois = parseInt(mois);
+    loyer = parseInt(loyer);
+    piece = parseInt(piece);
+    autres = parseInt(autres);
+    const CA_minus_commission = await Rendezvous.aggregate([
+        {
+            $match: {
+                is_valid: 1,
+                $expr: {
+                    $eq: [
+                        { $year: '$date_heure' },
+                        { $year: new Date() }
+                    ]
+                },
+                $expr: {
+                    $eq: [
+                        { $month: '$date_heure' },
+                        mois
+                    ]
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: 'services',
+                localField: 'id_service',
+                foreignField: '_id',
+                as: 'service'
+            }
+        },
+        {
+            $unwind: { path: "$service" }
+        },
+        {
+            $group: {
+                _id: { year: { $year: '$date_heure' }, month: { $month: '$date_heure' } },
+                chiffre: { $sum: { $subtract: ["$service.prix", {$multiply: ["$service.prix", { $divide: ["$service.commission", 100] }] }]} }
+            }
+        }
+    ])
+
+    const rep = {
+        "mois": CA_minus_commission[0]._id.month,
+        "year": CA_minus_commission[0]._id.year,
+        "CA": (CA_minus_commission[0].chiffre - loyer - piece - autres)
+    }
+
+    return rep;
+}
+
 module.exports = {
     getAll,
     getById,
@@ -123,5 +251,8 @@ module.exports = {
     login,
     getTempsMoyenTravailPourChaqueEmpoye,
     nbrReservation_jour,
-    nbrReservation_mois
+    nbrReservation_mois,
+    chiffreAffaire_jour,
+    chiffreAffaire_mois,
+    beneficeparmois
 }
