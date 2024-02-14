@@ -3,15 +3,18 @@ const mongoose = require('mongoose');
 const rendezvousSchema = new mongoose.Schema({
     id_customer: {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: "customer"
+        ref: "customer",
+        required: true
     },
     id_service: {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: "service"
+        ref: "service",
+        required: true
     },
     id_employe: {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: "employe"
+        ref: "employe",
+        required: true
     },
     date_heure: {
         type: Date,
