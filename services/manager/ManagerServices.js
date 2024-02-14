@@ -1,4 +1,6 @@
 const Manager = require('../../schemas/ManagerSchema.js')
+const Rendezvous = require('../../schemas/RendezvousSchema.js')
+const RdvTracking = require('../../schemas/RendezvoustrackingSchema.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 
@@ -57,11 +59,69 @@ const delete_manager = async (id) => {
     return await Manager.deleteOne({ _id : id });
 }
 
+const getTempsMoyenTravailPourChaqueEmpoye = async () => {
+    return Rendezvous.aggregate([
+        {
+            $match:{
+                is_valid: 1
+            }
+        },
+        {
+            $lookup: {
+                from: 'services',
+                localField: 'id_service',
+                foreignField: '_id',
+                as: 'service'
+            }
+        },
+        {
+            $unwind: { path: "$service" }
+        },
+        {
+            $group:{
+                _id: "$id_employe",
+                moyenne: { $avg: "$service.duree" }
+            }
+        },
+        {
+            $project: {
+                _id: "$_id",
+                moyenne: 1
+            }
+        }
+    ])
+}
+
+const nbrReservation_jour = async () => {
+    return await RdvTracking.aggregate([
+        {
+            $group: {
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+                count: { $sum: 1 }
+             }
+        }
+    ])
+}
+
+const nbrReservation_mois = async () => {
+    return await RdvTracking.aggregate([
+        {
+            $group: {
+                _id: { year: { $year: '$date' }, month: { $month: '$date' } },
+                count: { $sum: 1 }
+             }
+        }
+    ])
+}
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
     delete_manager,
-    login
+    login,
+    getTempsMoyenTravailPourChaqueEmpoye,
+    nbrReservation_jour,
+    nbrReservation_mois
 }

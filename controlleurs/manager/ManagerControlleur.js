@@ -142,11 +142,86 @@ const deleteManager = () => {
     })
 }
 
+const getTempsMoyenTravailPourChaqueEmpoye = () => {
+    return(async (req,res)=>{
+        try{
+            // await mongoose.connect(uri)
+            await service.getTempsMoyenTravailPourChaqueEmpoye()
+            .then((result)=>{
+                if(result.length<=0) return res.status(204).send('No match for the request')
+                return res.status(200).json(result)
+                
+            })
+            .catch((err) => {
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')
+            });
+        }catch(e){
+            console.log("Error : "+e.message)
+            // await mongoose.disconnect()
+            return res.status(500).send('Internal server error')
+        }finally{
+            // await mongoose.disconnect()
+        }
+    })
+}
+
+const getNbrRdv_jour = () => {
+    return(async (req,res)=>{
+        try{
+            // await mongoose.connect(uri)
+            await service.nbrReservation_jour()
+            .then((result)=>{
+                if(result.length<=0) return res.status(204).send('No match for the request')
+                return res.status(200).json(result)
+                
+            })
+            .catch((err) => {
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')
+            });
+        }catch(e){
+            console.log("Error : "+e.message)
+            // await mongoose.disconnect()
+            return res.status(500).send('Internal server error')
+        }finally{
+            // await mongoose.disconnect()
+        }
+    })
+}
+
+const getNbrRdv_mois = () => {
+    return(async (req,res)=>{
+        try{
+            // await mongoose.connect(uri)
+            await service.nbrReservation_mois()
+            .then((result)=>{
+                if(result.length<=0) return res.status(204).send('No match for the request')
+                return res.status(200).json(result)
+                
+            })
+            .catch((err) => {
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')
+            });
+        }catch(e){
+            console.log("Error : "+e.message)
+            // await mongoose.disconnect()
+            return res.status(500).send('Internal server error')
+        }finally{
+            // await mongoose.disconnect()
+        }
+    })
+}
+
 module.exports = {
     getManager,
     getManagerById,
     createManager,
     updateManager,
     deleteManager,
-    loginManager
+    loginManager,
+    getTempsMoyenTravailPourChaqueEmpoye,
+    getNbrRdv_jour,
+    getNbrRdv_mois
 }

@@ -22,6 +22,11 @@ const rendezvousSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
+    is_paid: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     created_at: {
         type: Date,
         default: () => Date.now()

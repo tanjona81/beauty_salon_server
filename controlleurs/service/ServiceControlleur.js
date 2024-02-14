@@ -57,7 +57,7 @@ const createService = () => {
             const {nom, prix, duree, commission} = req.body;
             await service.create(nom, prix, duree, commission)
             .then((result)=>{
-                return res.status(201).json("Service saved")
+                return res.status(201).json(result)
             })
             .catch((err) => {
                 console.log("Error : "+err.message)
@@ -80,7 +80,7 @@ const updateService = () => {
             const {nom, prix, duree, commission} = req.body;
             await service.update(req.params.id, nom, prix, duree, commission)
             .then((result)=>{
-                return res.status(200).json("Service updated")
+                return res.status(200).json(result)
             })
             .catch((err) => {
                 console.log("Error : "+err.message)

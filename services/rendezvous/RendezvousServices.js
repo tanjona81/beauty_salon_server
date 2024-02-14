@@ -1,5 +1,7 @@
 const Rendezvous = require('../../schemas/RendezvousSchema.js')
 const Employe = require('../../schemas/EmployeSchema.js')
+const Service = require('../../schemas/ServiceSchema.js')
+const RdvTracking = require('../../schemas/RendezvoustrackingSchema.js')
 const utils = require('../../Utils/Time.js')
 const mongoose = require('mongoose')
 
@@ -13,14 +15,18 @@ const getById = async (id) => {
 
 const create = async (id_customer, id_service, id_employe, date_heure) =>  {
     const employe = await Employe.findOne({_id : id_employe});
-    
-    //Convert the date_heure parameter into Date
+    const service = await Service.findOne({_id : id_service})
+
+    // Convert the date_heure parameter into Date
     const date = new Date(date_heure)
+
+    // date_heure + service.duree
+    let date_heure_plus_duree = new Date(date.getTime() + service.duree * 60000)
 
     const time_debut = utils.stringToTime(employe.heure_debut)
     const time_fin = utils.stringToTime(employe.heure_fin)
 
-    // Consvert date_heure parameter into string Y-M-D
+    // Consvert the date_heure parameter into string Y-M-D
     const formatted_date_string = date.toISOString().slice(0, 10)
 
     // Convert id_employe into objectId
@@ -60,6 +66,12 @@ const create = async (id_customer, id_service, id_employe, date_heure) =>  {
             }
         }
     ])
+
+    // Check if the employe work on the parameter date
+    if(date.getTime() < time_debut.getTime() || date.getTime() > time_fin.getTime()
+        || date_heure_plus_duree.getTime() > time_fin.getTime()) 
+        return {message:`${employe.nom} doesn\'t work on this date`}
+    
     // console.log(rendezvous_valid)
     for(let i=0;i<rendezvous_valid.length;i++){
         let rendezvousdate_plus_duree = new Date(rendezvous_valid[i].date_heure.getTime() + rendezvous_valid[i].service.duree * 60000)
@@ -68,18 +80,25 @@ const create = async (id_customer, id_service, id_employe, date_heure) =>  {
         // console.log(rendezvousdate_plus_duree.getTime())
 
         // Check if date between a valid rendezvous and a valid rendezvous + duree of the service
-        if(date.getTime() >= rendezvous_valid[i].date_heure && date.getTime() <= rendezvousdate_plus_duree)
+        // Check if date_heure_plus_duree between a valid rendezvous and a valid rendezvous + duree of the service
+        if((date.getTime() >= rendezvous_valid[i].date_heure && date.getTime() <= rendezvousdate_plus_duree) ||
+            (date_heure_plus_duree.getTime() >= rendezvous_valid[i].date_heure && 
+            date_heure_plus_duree.getTime() <= rendezvousdate_plus_duree))
             return {message:`${employe.nom} has already a meeting on this date`}
     }
-    if(date.getTime() < time_debut.getTime() || date.getTime() > time_fin.getTime()) 
-        return {message:`${employe.nom} doesn\'t work on this date`}
     
     let rendezvous = new Rendezvous();
     rendezvous.id_customer = id_customer
     rendezvous.id_service = id_service
     rendezvous.id_employe = id_employe
     rendezvous.date_heure = date_heure
-    return await rendezvous.save()
+    const rdvsave = await rendezvous.save();
+    
+    // Insert into rdv tracking
+    let track = new RdvTracking();
+    await track.save();
+
+    return rdvsave;
     // return "ok";
 }
 
