@@ -20,8 +20,11 @@ app.use('/customers',CustomerRouter)
 const rendezvousRouter = require('./routes/rendezvous/RendezvousRoute.js')
 app.use('/rendezvous',rendezvousRouter)
 
-const PreferenceRouter = require('./routes/preference/PreferenceRoute.js')
-app.use('/preferences',PreferenceRouter)
+const preferenceRouter = require('./routes/preference/PreferenceRoute.js')
+app.use('/preferences',preferenceRouter)
+
+const offerRouter = require('./routes/offer/OfferRoute.js')
+app.use('/offers',offerRouter)
 
 app.listen(5000, () => {console.log("http://localhost:5000/")})
 

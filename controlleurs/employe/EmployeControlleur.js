@@ -1,7 +1,6 @@
 const uri = require('../../config/DbConfig.js')
 const mongoose = require('mongoose');
 const service = require('../../services/employe/EmployeServices.js')
-const sendmail = require('../../Utils/Gmail.js')
 
 const loginEmploye = () => {
     return(async (req,res)=>{
@@ -201,7 +200,6 @@ const validate_rendezvous = () => {
             await service.validate_rendezvous(req.params.id)
             .then((result)=>{
                 if(result.length<=0) return res.status(204).send('No match for the request')
-                sendmail.send();
                 return res.status(200).json(result)
                 
             })

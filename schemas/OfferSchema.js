@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const rendezvousSchema = new mongoose.Schema({
+const offerSchema = new mongoose.Schema({
     id_customer: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: "customer",
@@ -11,12 +11,11 @@ const rendezvousSchema = new mongoose.Schema({
         ref: "service",
         required: true
     },
-    id_employe: {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "employe",
+    reduction: {
+        type: Number,
         required: true
     },
-    date_heure: {
+    date_heure_fin: {
         type: Date,
         required: true,
         validate:{
@@ -24,20 +23,14 @@ const rendezvousSchema = new mongoose.Schema({
             message: props => `${props.value} should not be lower than the current date`
         }
     },
-    is_valid: {
-        type: Number,
-        required: true,
-        default: 0
-    },
-    is_paid: {
-        type: Number,
-        required: true,
-        default: 0
-    },
     created_at: {
         type: Date,
         default: () => Date.now()
     },
 })
 
-module.exports = mongoose.model("rendezvous", rendezvousSchema)
+// const dateValidator = function(date) {
+//     return date >= new Date();
+// };
+
+module.exports = mongoose.model("offer", offerSchema)
