@@ -1,9 +1,11 @@
 const Employe = require("../../schemas/EmployeSchema.js");
+const Customer = require("../../schemas/CustomerSchema.js");
 const Rendezvous = require("../../schemas/RendezvousSchema.js");
-const RendezvousServices = require("../rendezvous/RendezvousServices.js");
+const cron = require("node-cron");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const sendmail = require("../../Utils/Gmail.js");
 const config = require("../../config/auth.config.js");
 
 const login = async (email, mdp) => {
@@ -115,14 +117,34 @@ const getDoneRendezvous = async (id_employe) => {
 };
 
 const validate_rendezvous = async (id_rendezvous) => {
-  return await RendezvousServices.update(
-    id_rendezvous,
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    1
+  const rdv = await Rendezvous.findById(id_rendezvous);
+  const date_plus_1mn = new Date(rdv.date_heure.getTime() - 1 * 60000);
+  const customer = await Customer.findById(rdv.id_customer);
+
+  // Send validation email to the customer
+  sendmail.validation(
+    customer.email,
+    customer.nom,
+    rdv.date_heure.toISOString().slice(0, 10),
+    rdv.date_heure.toTimeString().slice(0, 8)
   );
+
+  // send a reminder email to the customer
+  cron.schedule(
+    `${date_plus_1mn.getMinutes()} ${date_plus_1mn.getHours()} ${date_plus_1mn.getDate()} 
+    ${date_plus_1mn.getMonth() + 1} *`,
+    () => {
+      sendmail.reminder(
+        customer.email,
+        customer.nom,
+        rdv.date_heure.toISOString().slice(0, 10),
+        rdv.date_heure.toTimeString().slice(0, 8)
+      );
+    }
+  );
+
+  rdv.is_valid = 1;
+  return rdv;
 };
 
 const commission_per_day = async (id_employe) => {

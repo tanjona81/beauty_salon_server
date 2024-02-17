@@ -10,6 +10,7 @@ router.get(
 );
 router.post("/login", controlleur.loginCustomer());
 router.post("/create", controlleur.createCustomer());
+router.post("/payment", controlleur.payment());
 
 router
   .route("/customer/:id")

@@ -41,6 +41,10 @@ const employeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    is_activated:{
+        type: Number,
+        default: () => 1
+    },
     created_at: {
         type: Date,
         default: () => Date.now()

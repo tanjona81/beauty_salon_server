@@ -489,6 +489,78 @@ const getNbrRdv_mois = () => {
   };
 };
 
+const getChiffreAffaire_jour = () => {
+    return(async (req,res)=>{
+        try{
+            // await mongoose.connect(uri)
+            await service.chiffreAffaire_jour()
+            .then((result)=>{
+                if(result.length<=0) return res.status(204).send('No match for the request')
+                return res.status(200).json(result)
+                
+            })
+            .catch((err) => {
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')
+            });
+        }catch(e){
+            console.log("Error : "+e.message)
+            // await mongoose.disconnect()
+            return res.status(500).send('Internal server error')
+        }finally{
+            // await mongoose.disconnect()
+        }
+    })
+}
+
+const getChiffreAffaire_mois = () => {
+    return(async (req,res)=>{
+        try{
+            // await mongoose.connect(uri)
+            await service.chiffreAffaire_mois()
+            .then((result)=>{
+                if(result.length<=0) return res.status(204).send('No match for the request')
+                return res.status(200).json(result)
+                
+            })
+            .catch((err) => {
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')
+            });
+        }catch(e){
+            console.log("Error : "+e.message)
+            // await mongoose.disconnect()
+            return res.status(500).send('Internal server error')
+        }finally{
+            // await mongoose.disconnect()
+        }
+    })
+}
+
+const getCAMinusCost = () => {
+    return(async (req,res)=>{
+        try{
+            // await mongoose.connect(uri)
+            await service.beneficeparmois(req.query.mois, req.query.loyer, req.query.piece, req.query.autres)
+            .then((result)=>{
+                if(result.length<=0) return res.status(204).send('No match for the request')
+                return res.status(200).json(result)
+                
+            })
+            .catch((err) => {
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')
+            });
+        }catch(e){
+            console.log("Error : "+e.message)
+            // await mongoose.disconnect()
+            return res.status(500).send('Internal server error')
+        }finally{
+            // await mongoose.disconnect()
+        }
+    })
+}
+
 module.exports = {
   getManager,
   getManagerById,
@@ -499,4 +571,7 @@ module.exports = {
   getTempsMoyenTravailPourChaqueEmpoye,
   getNbrRdv_jour,
   getNbrRdv_mois,
+    getChiffreAffaire_jour,
+    getChiffreAffaire_mois,
+    getCAMinusCost,
 };

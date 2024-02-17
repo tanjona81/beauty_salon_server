@@ -20,6 +20,12 @@ router.post(
 );
 
 router.get(
+  "/CA",
+  [authJwt.verifyToken, authJwt.isManager],
+  controlleur.getCAMinusCost()
+);
+
+router.get(
   "/statistique/employe",
   [authJwt.verifyToken, authJwt.isManager],
   controlleur.getTempsMoyenTravailPourChaqueEmpoye()

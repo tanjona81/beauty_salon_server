@@ -20,6 +20,12 @@ app.use("/api/customers", CustomerRouter);
 const rendezvousRouter = require("./routes/rendezvous/RendezvousRoute.js");
 app.use("/api/rendezvous", rendezvousRouter);
 
+const preferenceRouter = require('./routes/preference/PreferenceRoute.js')
+app.use('/preferences',preferenceRouter)
+
+const offerRouter = require('./routes/offer/OfferRoute.js')
+app.use('/offers',offerRouter)
+
 app.listen(5000, () => {
   console.log("http://localhost:5000/");
 });

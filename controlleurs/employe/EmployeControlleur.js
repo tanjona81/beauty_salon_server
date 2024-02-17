@@ -1,7 +1,6 @@
 const uri = require("../../config/DbConfig.js");
 const mongoose = require("mongoose");
 const service = require("../../services/employe/EmployeServices.js");
-const sendmail = require("../../Utils/Gmail.js");
 const HttpStatus = require("http-status-codes");
 
 const loginEmploye = () => {
@@ -454,7 +453,6 @@ const validate_rendezvous = () => {
         .then((result) => {
           if (result.length <= 0)
             return res.status(204).send("No match for the request");
-          sendmail.send();
           return res.status(200).json(result);
         })
         .catch((err) => {
