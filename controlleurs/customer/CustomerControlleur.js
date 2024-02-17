@@ -142,11 +142,37 @@ const deleteCustomer = () => {
     })
 }
 
+const payment = () => {
+    return(async (req,res)=>{
+        try{
+            // await mongoose.connect(uri)
+            const {id_rendezvous} = req.body;
+            await service.payment(id_rendezvous)
+            .then((result)=>{
+                if(!result) return res.status(204).send('No match for the request')
+                return res.status(200).json(result)
+                
+            })
+            .catch((err) => {
+                console.log("Error : "+err.message)
+                return res.status(500).send('Internal server error')
+            });
+        }catch(e){
+            console.log("Error : "+e.message)
+            // await mongoose.disconnect()
+            return res.status(500).send('Internal server error')
+        }finally{
+            // await mongoose.disconnect()
+        }
+    })
+}
+
 module.exports = {
     getCustomer,
     getCustomerById,
     createCustomer,
     updateCustomer,
     deleteCustomer,
-    loginCustomer
+    loginCustomer,
+    payment
 }
