@@ -1,5 +1,6 @@
 const Manager = require('../../schemas/ManagerSchema.js')
 const Rendezvous = require('../../schemas/RendezvousSchema.js')
+const Payment = require('../../schemas/PaymentSchema.js')
 const RdvTracking = require('../../schemas/RendezvoustrackingSchema.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
@@ -115,80 +116,100 @@ const nbrReservation_mois = async () => {
 }
 
 const chiffreAffaire_jour = async () => {
-    return await Rendezvous.aggregate([
-        {
-            $match: {
-                is_valid: 1
-            }
-        },
-        {
-            $lookup: {
-                from: 'services',
-                localField: 'id_service',
-                foreignField: '_id',
-                as: 'service'
-            }
-        },
-        {
-            $unwind: { path: "$service" }
-        },
+    return await Payment.aggregate([
         {
             $group: {
-                _id: { $dateToString: { format: "%Y-%m-%d", date: "$date_heure" } },
+                _id: { $dateToString: { format: "%Y-%m-%d", date: "$created_at" } },
                 chiffre: {
-                    $sum: "$service.prix"
+                    $sum: "$prix"
                 }
-                // chiffre: { 
-                //     $sum: { 
-                //         $subtract: [
-                //             "$service.prix", 
-                //             {
-                //                 $multiply: [
-                //                     "$service.prix", 
-                //                     { 
-                //                         $divide: [
-                //                         "$service.commission", 
-                //                         100
-                //                         ] 
-                //                     }
-                //                 ]
-                //             }
-                //         ]
-                //     } 
-                // }
             }
         }
     ])
+    // return await Rendezvous.aggregate([
+    //     {
+    //         $match: {
+    //             is_valid: 1
+    //         }
+    //     },
+    //     {
+    //         $lookup: {
+    //             from: 'services',
+    //             localField: 'id_service',
+    //             foreignField: '_id',
+    //             as: 'service'
+    //         }
+    //     },
+    //     {
+    //         $unwind: { path: "$service" }
+    //     },
+    //     {
+    //         $group: {
+    //             _id: { $dateToString: { format: "%Y-%m-%d", date: "$date_heure" } },
+    //             chiffre: {
+    //                 $sum: "$service.prix"
+    //             }
+    //             // chiffre: { 
+    //             //     $sum: { 
+    //             //         $subtract: [
+    //             //             "$service.prix", 
+    //             //             {
+    //             //                 $multiply: [
+    //             //                     "$service.prix", 
+    //             //                     { 
+    //             //                         $divide: [
+    //             //                         "$service.commission", 
+    //             //                         100
+    //             //                         ] 
+    //             //                     }
+    //             //                 ]
+    //             //             }
+    //             //         ]
+    //             //     } 
+    //             // }
+    //         }
+    //     }
+    // ])
 }
 
 const chiffreAffaire_mois = async () => {
-    return await Rendezvous.aggregate([
-        {
-            $match: {
-                is_valid: 1
-            }
-        },
-        {
-            $lookup: {
-                from: 'services',
-                localField: 'id_service',
-                foreignField: '_id',
-                as: 'service'
-            }
-        },
-        {
-            $unwind: { path: "$service" }
-        },
+    return await Payment.aggregate([
         {
             $group: {
-                _id: { year: { $year: '$date_heure' }, month: { $month: '$date_heure' } },
+                _id: { year: { $year: '$created_at' }, month: { $month: '$created_at' } },
                 chiffre: {
-                    $sum: "$service.prix"
+                    $sum: "$prix"
                 }
-                // chiffre: { $sum: { $subtract: ["$service.prix", {$multiply: ["$service.prix", { $divide: ["$service.commission", 100] }] }]} }
             }
         }
     ])
+    // return await Rendezvous.aggregate([
+    //     {
+    //         $match: {
+    //             is_valid: 1
+    //         }
+    //     },
+    //     {
+    //         $lookup: {
+    //             from: 'services',
+    //             localField: 'id_service',
+    //             foreignField: '_id',
+    //             as: 'service'
+    //         }
+    //     },
+    //     {
+    //         $unwind: { path: "$service" }
+    //     },
+    //     {
+    //         $group: {
+    //             _id: { year: { $year: '$date_heure' }, month: { $month: '$date_heure' } },
+    //             chiffre: {
+    //                 $sum: "$service.prix"
+    //             }
+    //             // chiffre: { $sum: { $subtract: ["$service.prix", {$multiply: ["$service.prix", { $divide: ["$service.commission", 100] }] }]} }
+    //         }
+    //     }
+    // ])
 }
 
 const beneficeparmois = async (mois, loyer, piece, autres) => {
@@ -228,15 +249,46 @@ const beneficeparmois = async (mois, loyer, piece, autres) => {
         {
             $group: {
                 _id: { year: { $year: '$date_heure' }, month: { $month: '$date_heure' } },
-                chiffre: { $sum: { $subtract: ["$service.prix", {$multiply: ["$service.prix", { $divide: ["$service.commission", 100] }] }]} }
+                chiffre: { $sum: {$multiply: ["$service.prix", { $divide: ["$service.commission", 100] }] } }
             }
         }
     ])
 
+    const paid = await Payment.aggregate([
+        {
+            $match:{
+                $expr: {
+                    $eq: [
+                        { $year: '$created_at' },
+                        { $year: new Date() }
+                    ]
+                },
+                $expr: {
+                    $eq: [
+                        { $month: '$created_at' },
+                        mois
+                    ]
+                }
+            }
+        },
+        {
+            $group: {
+                _id: { year: { $year: '$created_at' }, month: { $month: '$created_at' } },
+                chiffre: {
+                    $sum: "$prix"
+                }
+            }
+        }
+    ])
+
+    // console.log(CA_minus_commission[0].chiffre)
+    // console.log(paid[0].chiffre)
+    // console.log((CA_minus_commission[0].chiffre + loyer + piece + autres))
+
     const rep = {
         "mois": CA_minus_commission[0]._id.month,
         "year": CA_minus_commission[0]._id.year,
-        "CA": (CA_minus_commission[0].chiffre - loyer - piece - autres)
+        "CA": (paid[0].chiffre - (CA_minus_commission[0].chiffre + loyer + piece + autres))
     }
 
     return rep;

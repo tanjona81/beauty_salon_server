@@ -1,6 +1,10 @@
 const Customer = require('../../schemas/CustomerSchema.js')
+const Offer = require('../../schemas/OfferSchema.js')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose');
+const Rendezvous = require('../../schemas/RendezvousSchema.js');
+const Payment = require('../../schemas/PaymentSchema.js')
 
 const login = async (email, mdp) => {
     const user = await Customer.findOne({email:email})
@@ -67,11 +71,41 @@ const delete_customer = async (id) => {
     return await Customer.deleteOne({ _id : id });
 }
 
+const payment = async (id_rendezvous) => {
+    //Check if id_rendezvous is already paid
+    const paid = await Payment.find({"id_rendezvous" : id_rendezvous})
+    if(paid.length > 0) throw new Error("Rendez-vous already paid")
+
+    const rdv = await Rendezvous.where("_id")
+                                .equals(id_rendezvous)
+                                .populate("id_service")
+
+    // Check if id_service and id_customer have an offer based on the id_rendezvous date_heure
+    const offer = await Offer.aggregate([
+        {
+            $match: {
+                id_customer: rdv[0].id_customer,
+                id_service: rdv[0].id_service._id,
+                date_heure_fin: { $gte: rdv[0].date_heure }
+            }
+        }
+    ])
+
+    let pay = new Payment()
+    pay.id_rendezvous = id_rendezvous
+    pay.prix = rdv[0].id_service.prix - (rdv[0].id_service.prix * (offer[0].reduction / 100))
+    pay.save()
+
+    return pay
+    // return offer
+}
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
     delete_customer,
-    login
+    login,
+    payment
 }
