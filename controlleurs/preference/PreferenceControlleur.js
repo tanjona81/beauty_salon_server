@@ -1,32 +1,8 @@
 const uri = require('../../config/DbConfig.js')
 const mongoose = require('mongoose');
-const service = require('../../services/employe/EmployeServices.js')
+const service = require('../../services/preference/PreferenceServices.js')
 
-const loginEmploye = () => {
-    return(async (req,res)=>{
-        try{
-            // await mongoose.connect(uri)
-            await service.login(req.query.email, req.query.mdp)
-            .then((result)=>{
-                if(!result) return res.status(401).send('No match for the request')
-                return res.status(200).json(result)
-                
-            })
-            .catch((err) => {
-                console.log("Error : "+err.message)
-                return res.status(500).send('Internal server error')
-            });
-        }catch(e){
-            console.log("Error : "+e.message)
-            // await mongoose.disconnect()
-            return res.status(500).send('Internal server error')
-        }finally{
-            // await mongoose.disconnect()
-        }
-    })
-}
-
-const getEmploye = () => {
+const getPreference = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
@@ -50,7 +26,7 @@ const getEmploye = () => {
     })
 }
 
-const getEmployeById = () => {
+const getPreferenceById = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
@@ -74,12 +50,12 @@ const getEmployeById = () => {
     })
 }
 
-const createEmploye = () => {
+const createPreference = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            const {image, nom, prenom, tel, email, addresse, mdp, heure_debut, heure_fin} = req.body;
-            await service.create(image, nom, prenom, tel, email, addresse, mdp, heure_debut, heure_fin)
+            const {id_customer, id_prefere, designation} = req.body;
+            await service.create(id_customer, id_prefere, designation)
             .then((result)=>{
                 return res.status(201).json(result)
             })
@@ -97,12 +73,12 @@ const createEmploye = () => {
     })
 }
 
-const updateEmploye = () => {
+const updatePreference = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            const {image, nom, prenom, tel, email, addresse, mdp, heure_debut, heure_fin} = req.body;
-            await service.update(req.params.id, image, nom, prenom, tel, email, addresse, mdp, heure_debut, heure_fin)
+            const {id_customer, id_prefere, designation} = req.body;
+            await service.update(req.params.id, id_customer, id_prefere, designation)
             .then((result)=>{
                 return res.status(200).json(result)
             })
@@ -120,13 +96,13 @@ const updateEmploye = () => {
     })
 }
 
-const deleteEmploye = () => {
+const deletePreference = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            await service.delete_employe(req.params.id)
+            await service.delete_preference(req.params.id)
             .then((result)=>{
-                return res.status(204).json("Employe deleted")
+                return res.status(204).json("Preference deleted")
             })
             .catch((err) => {
                 console.log("Error : "+err.message)
@@ -142,14 +118,13 @@ const deleteEmploye = () => {
     })
 }
 
-const getRendezvousEmploye = () => {
+const getPreferenceEmploye = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            // console.log(req.params.id)
-            await service.getRendezvous(req.params.id)
+            await service.employe_prefere(req.params.id)
             .then((result)=>{
-                if(result.length<=0) return res.status(204).send('No match for the request')
+                if(!result) return res.status(204).send('No match for the request')
                 return res.status(200).json(result)
                 
             })
@@ -167,64 +142,13 @@ const getRendezvousEmploye = () => {
     })
 }
 
-const getDoneRendezvousEmploye = () => {
+const getPreferenceService = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            // console.log(req.params.id)
-            await service.getDoneRendezvous(req.params.id)
+            await service.service_prefere(req.params.id)
             .then((result)=>{
-                if(result.length<=0) return res.status(204).send('No match for the request')
-                return res.status(200).json(result)
-                
-            })
-            .catch((err) => {
-                console.log("Error : "+err.message)
-                return res.status(500).send('Internal server error')
-            });
-        }catch(e){
-            console.log("Error : "+e.message)
-            // await mongoose.disconnect()
-            return res.status(500).send('Internal server error')
-        }finally{
-            // await mongoose.disconnect()
-        }
-    })
-}
-
-const validate_rendezvous = () => {
-    return(async (req,res)=>{
-        try{
-            // await mongoose.connect(uri)
-            // console.log(req.params.id)
-            await service.validate_rendezvous(req.params.id)
-            .then((result)=>{
-                if(result.length<=0) return res.status(204).send('No match for the request')
-                return res.status(200).json(result)
-                
-            })
-            .catch((err) => {
-                console.log("Error : "+err.message)
-                return res.status(500).send('Internal server error')
-            });
-        }catch(e){
-            console.log("Error : "+e.message)
-            // await mongoose.disconnect()
-            return res.status(500).send('Internal server error')
-        }finally{
-            // await mongoose.disconnect()
-        }
-    })
-}
-
-const getCommission = () => {
-    return(async (req,res)=>{
-        try{
-            // await mongoose.connect(uri)
-            // console.log(req.params.id)
-            await service.commission_per_day(req.params.id)
-            .then((result)=>{
-                if(result.length<=0) return res.status(204).send('No match for the request')
+                if(!result) return res.status(204).send('No match for the request')
                 return res.status(200).json(result)
                 
             })
@@ -243,14 +167,11 @@ const getCommission = () => {
 }
 
 module.exports = {
-    getEmploye,
-    getEmployeById,
-    createEmploye,
-    updateEmploye,
-    deleteEmploye,
-    loginEmploye,
-    getRendezvousEmploye,
-    getDoneRendezvousEmploye,
-    validate_rendezvous,
-    getCommission
+    getPreference,
+    getPreferenceById,
+    createPreference,
+    updatePreference,
+    deletePreference,
+    getPreferenceEmploye,
+    getPreferenceService
 }

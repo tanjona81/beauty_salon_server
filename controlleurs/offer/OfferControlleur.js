@@ -1,8 +1,8 @@
 const uri = require('../../config/DbConfig.js')
 const mongoose = require('mongoose');
-const service = require('../../services/rendezvous/RendezvousServices.js')
+const service = require('../../services/offer/OfferServices.js')
 
-const getRendezvous = () => {
+const getOffer = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
@@ -26,7 +26,7 @@ const getRendezvous = () => {
     })
 }
 
-const getRendezvousById = () => {
+const getOfferById = () => {
     return(async (req,res)=>{
         try{
             // await mongoose.connect(uri)
@@ -50,12 +50,12 @@ const getRendezvousById = () => {
     })
 }
 
-const createRendezvous = () => {
+const createOffer = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            const {id_customer, id_service, id_employe, date_heure} = req.body;
-            await service.create(id_customer, id_service, id_employe, date_heure)
+            const {id_customer, id_service, reduction, date_heure_fin} = req.body;
+            await service.create(id_customer, id_service, reduction, date_heure_fin)
             .then((result)=>{
                 return res.status(201).json(result)
             })
@@ -72,18 +72,19 @@ const createRendezvous = () => {
             console.log("Error : "+e.message)
             // await mongoose.disconnect()
             return res.status(500).send('Internal server error')
+            
         }finally{
             // await mongoose.disconnect()
         }
     })
 }
 
-const updateRendezvous = () => {
+const updateOffer = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            const {id_customer, id_service, id_employe, date_heure, is_valid} = req.body;
-            await service.update(req.params.id, id_customer, id_service, id_employe, date_heure, is_valid)
+            const {id_customer, id_service, reduction, date_heure_fin} = req.body;
+            await service.update(req.params.id, id_customer, id_service, reduction, date_heure_fin)
             .then((result)=>{
                 return res.status(200).json(result)
             })
@@ -101,13 +102,13 @@ const updateRendezvous = () => {
     })
 }
 
-const deleteRendezvous = () => {
+const deleteOffer = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            await service.delete_rendezvous(req.params.id)
+            await service.delete_offer(req.params.id)
             .then((result)=>{
-                return res.status(204).json("Rendezvous deleted")
+                return res.status(204).json("Offer deleted")
             })
             .catch((err) => {
                 console.log("Error : "+err.message)
@@ -124,9 +125,9 @@ const deleteRendezvous = () => {
 }
 
 module.exports = {
-    getRendezvous,
-    getRendezvousById,
-    createRendezvous,
-    updateRendezvous,
-    deleteRendezvous
+    getOffer,
+    getOfferById,
+    createOffer,
+    updateOffer,
+    deleteOffer
 }

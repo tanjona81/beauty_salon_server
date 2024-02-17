@@ -8,14 +8,38 @@ const transporter = nodemailer.createTransport({
     pass: 'bcdwegwxynsdhrxk'
   }
 });
-const send = () => {
+const validation = (email, name, date, heure) => {
   // Define email options
   const mailOptions = {
     from: '"Beauty Salon support" mailteste81t@gmail.com', // Sender email address
-    to: 'tanmelo81@gmail.com', // Recipient email address
+    to: email, // Recipient email address
     subject: 'Validation of your meeting', // Email subject
-    html: "<h2>Hello ---,</h2> </br><h3>Your meeting has been approved</h3></br><h3>See you soon</h3>" // Email body (plain text)
-    // You can also use html: '<h1>Hello from Node.js!</h1>' for HTML content
+    html: `<h2>Hello ${name},</h2> 
+          </br>
+          <p>Your meeting has been approved on ${date} at ${heure}</p>
+          </br>
+          <p>See you soon</p>` // Email body
+  };
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
+}
+
+const reminder = (email, name, date, heure) => {
+  // Define email options
+  const mailOptions = {
+    from: '"Beauty Salon support" mailteste81t@gmail.com', // Sender email address
+    to: email, // Recipient email address
+    subject: 'Reminder of your meeting', // Email subject
+    html: `<h2>Hello ${name},</h2> 
+          </br>
+          <p>You have a meeting on ${date} at ${heure}</p>
+          </br>
+          <p>See you soon</p>` // Email body
   };
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
@@ -28,5 +52,6 @@ const send = () => {
 
 // Send email
 module.exports = {
-  send
+  validation,
+  reminder
 }
