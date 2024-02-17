@@ -1,13 +1,22 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const controlleur = require('../../controlleurs/service/ServiceControlleur.js')
+const controlleur = require("../../controlleurs/service/ServiceControlleur.js");
+const { authJwt } = require("../../middlewares");
 
-router.get('/',controlleur.getService())
-router.post('/',controlleur.createService())
+router.get("/list", controlleur.getService());
+router.post(
+  "/create",
+  [authJwt.verifyToken, authJwt.isManager],
+  controlleur.createService()
+);
 
-router.route('/:id')
-    .get(controlleur.getServiceById())
-    .put(controlleur.updateService())
-    .delete(controlleur.deleteService())
+router
+  .route("/service/:id")
+  .get(controlleur.getServiceById())
+  .put([authJwt.verifyToken, authJwt.isManager], controlleur.updateService())
+  .delete(
+    [authJwt.verifyToken, authJwt.isManager],
+    controlleur.deleteService()
+  );
 
 module.exports = router;

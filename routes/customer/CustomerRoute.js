@@ -1,14 +1,23 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const controlleur = require('../../controlleurs/customer/CustomerControlleur.js')
+const controlleur = require("../../controlleurs/customer/CustomerControlleur.js");
+const { authJwt } = require("../../middlewares");
 
-router.get('/',controlleur.getCustomer())
-router.get('/login',controlleur.loginCustomer())
-router.post('/',controlleur.createCustomer())
+router.get(
+  "/list",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.getCustomer()
+);
+router.post("/login", controlleur.loginCustomer());
+router.post("/create", controlleur.createCustomer());
 
-router.route('/:id')
-    .get(controlleur.getCustomerById())
-    .put(controlleur.updateCustomer())
-    .delete(controlleur.deleteCustomer())
+router
+  .route("/customer/:id")
+  .get([authJwt.verifyToken], controlleur.getCustomerById())
+  .put([authJwt.verifyToken], controlleur.updateCustomer())
+  .delete(
+    [authJwt.verifyToken, authJwt.isManager],
+    controlleur.deleteCustomer()
+  );
 
 module.exports = router;
