@@ -1,5 +1,8 @@
 const Offer = require('../../schemas/OfferSchema.js')
+const Customer = require('../../schemas/CustomerSchema.js')
+const Service = require('../../schemas/ServiceSchema.js')
 const mongoose = require('mongoose')
+const gmail = require('../../Utils/Gmail.js')
 
 const getAll = async () => {
     return await Offer.find();
@@ -26,12 +29,20 @@ const create = async (id_customer, id_service, reduction, date_heure_fin) =>  {
     if(offer_exist.length > 0 && (new Date(date_heure_fin).getTime()) <= offer_exist[0].date_heure_fin) 
     throw new Error("There is already an Offer with this customer for that specific service")
 
+    const customer = await Customer.findById(id_customer)
+    const service = await Service.findById(id_service)
+
+    // console.log(customer)
+    // console.log(service)
+
     let offer = new Offer();
     offer.id_customer = id_customer
     offer.id_service = id_service
     offer.reduction = reduction
     offer.date_heure_fin = date_heure_fin
-    return await offer.save()
+    const rep = await offer.save()
+    gmail.sendOffer(customer.email, customer.nom, service.nom, reduction, date_heure_fin)
+    return rep
 }
 
 const update = async (id, id_customer, id_service, reduction, date_heure_fin) => {
@@ -50,7 +61,7 @@ const update = async (id, id_customer, id_service, reduction, date_heure_fin) =>
     //Check if there is already an Offer with this customer for that specific service
     if(offer_exist.length > 0 && (new Date(date_heure_fin).getTime()) <= offer_exist[0].date_heure_fin) 
     throw new Error("There is already an Offer with this customer for that specific service")
-    
+
     let offer = await Offer.findById(id)
     if(id_customer !== undefined) offer.id_customer = id_customer
     if(id_service !== undefined) offer.id_service = id_service
