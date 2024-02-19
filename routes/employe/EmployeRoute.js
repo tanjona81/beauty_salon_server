@@ -1,19 +1,47 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const controlleur = require('../../controlleurs/employe/EmployeControlleur.js')
+const controlleur = require("../../controlleurs/employe/EmployeControlleur.js");
+const { authJwt } = require("../../middlewares");
 
-router.get('/',controlleur.getEmploye())
-router.post('/',controlleur.createEmploye())
+router.get("/list", controlleur.getEmploye());
+router.post(
+  "/create",
+  [authJwt.verifyToken, authJwt.isManager],
+  controlleur.createEmploye()
+);
 
-router.get('/login',controlleur.loginEmploye())
-router.get('/rendezvous/:id',controlleur.getRendezvousEmploye())
-router.get('/rendezvousdone/:id',controlleur.getDoneRendezvousEmploye())
-router.put('/rendezvousvalidate/:id',controlleur.validate_rendezvous())
-router.get('/commission/:id',controlleur.getCommission())
+router.post("/login", controlleur.loginEmploye());
+router.get(
+  "/rendezvous/:id",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.getRendezvousEmploye()
+);
+router.get(
+  "/rendezvousdone/:id",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.getDoneRendezvousEmploye()
+);
+router.put(
+  "/rendezvousvalidate/:id",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.validate_rendezvous()
+);
+router.get(
+  "/commission/:id",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.getCommission()
+);
 
-router.route('/:id')
-    .get(controlleur.getEmployeById())
-    .put(controlleur.updateEmploye())
-    .delete(controlleur.deleteEmploye())
+router
+  .route("/employe/:id")
+  .get(
+    [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+    controlleur.getEmployeById()
+  )
+  .put([authJwt.verifyToken, authJwt.isManager], controlleur.updateEmploye())
+  .delete(
+    [authJwt.verifyToken, authJwt.isManager],
+    controlleur.deleteEmploye()
+  );
 
 module.exports = router;
