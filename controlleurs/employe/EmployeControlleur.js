@@ -344,7 +344,7 @@ const getRendezvousEmploye = () => {
   return async (req, res) => {
     try {
       await service
-        .getRendezvous(req.params.id)
+        .getRendezvous(req.user_id)
         .then((result) => {
           if (!result) {
             const responseData = {
@@ -398,7 +398,7 @@ const getDoneRendezvousEmploye = () => {
     try {
       // await mongoose.connect(uri)
       await service
-        .getDoneRendezvous(req.params.id)
+        .getDoneRendezvous(req.user_id)
         .then((result) => {
           const responseData = {
             status: true,
@@ -493,7 +493,7 @@ const getCommission = () => {
     try {
       // await mongoose.connect(uri)
       await service
-        .commission_per_day(req.params.id)
+        .commission_per_day(req.user_id)
         .then((result) => {
           const responseData = {
             status: true,

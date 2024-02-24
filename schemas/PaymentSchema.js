@@ -7,6 +7,16 @@ const PaymentSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    id_customer: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "customer",
+        required: true
+    },
+    id_service: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "service",
+        required: true
+    },
     prix: {
         type: Number,
         required: true

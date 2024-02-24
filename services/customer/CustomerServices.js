@@ -94,6 +94,8 @@ const payment = async (id_rendezvous) => {
 
   let pay = new Payment();
   pay.id_rendezvous = id_rendezvous;
+  pay.id_customer = rdv[0].id_customer;
+  pay.id_service = rdv[0].id_service._id;
   pay.prix =
     rdv[0].id_service.prix -
     rdv[0].id_service.prix * (offer[0].reduction / 100);
@@ -101,6 +103,121 @@ const payment = async (id_rendezvous) => {
 
   return pay;
   // return offer
+};
+
+const getHistoryRendezvous = async (id_customer) => {
+  const _id_customer = new mongoose.Types.ObjectId(id_customer);
+  return await Rendezvous.aggregate([
+    {
+      $match: {
+        id_customer: _id_customer,
+        is_valid: 1
+      },
+    },
+    {
+      $lookup: {
+        from: "payment",
+        localField: "_id",
+        foreignField: "id_rendezvous",
+        as: "payment",
+      },
+    },
+    {
+      $unwind: { path: "$payment", preserveNullAndEmptyArrays: true},
+    },
+    {
+      $lookup: {
+        from: "services",
+        localField: "id_service",
+        foreignField: "_id",
+        as: "service",
+      },
+    },
+    {
+      $unwind: { path: "$service" },
+    },
+    {
+      $lookup: {
+        from: "employes",
+        localField: "id_employe",
+        foreignField: "_id",
+        as: "employe",
+      },
+    },
+    {
+      $unwind: { path: "$employe" },
+    },
+    {
+      $addFields:{
+        status: {
+          $cond: {
+              if: { $eq: [{ $ifNull: ["$payment", null] }, null] },
+              then: "not paid",
+              else: "paid"
+          }
+      }
+      }
+    },
+    {
+      $sort: {
+        status: 1,
+        date_heure: -1
+      }
+    }
+  ]);
+};
+
+const getNotPaid = async (id_customer) => {
+  const _id_customer = new mongoose.Types.ObjectId(id_customer);
+  return await Rendezvous.aggregate([
+    {
+      $match: {
+        id_customer: _id_customer,
+        is_valid: 1
+      },
+    },
+    {
+      $lookup: {
+        from: "payment",
+        localField: "_id",
+        foreignField: "id_rendezvous",
+        as: "payment",
+      },
+    },
+    {
+      $unwind: { path: "$payment", preserveNullAndEmptyArrays: true},
+    },
+    {
+      $lookup: {
+        from: "services",
+        localField: "id_service",
+        foreignField: "_id",
+        as: "service",
+      },
+    },
+    {
+      $unwind: { path: "$service" },
+    },
+    {
+      $lookup: {
+        from: "employes",
+        localField: "id_employe",
+        foreignField: "_id",
+        as: "employe",
+      },
+    },
+    {
+      $unwind: { path: "$employe" },
+    },
+    {
+      $match: {
+        payement: { $eq: null }
+      }
+    },
+    {
+      $sort: {date_heure: -1}
+    },
+  ]);
 };
 
 module.exports = {
@@ -111,4 +228,6 @@ module.exports = {
   delete_customer,
   login,
   payment,
+  getHistoryRendezvous,
+  getNotPaid
 };

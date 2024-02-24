@@ -10,7 +10,6 @@ router.get(
 );
 router.post(
   "/login",
-  [authJwt.verifyToken, authJwt.isManager],
   controlleur.loginManager()
 );
 router.post(
@@ -40,6 +39,9 @@ router.get(
   [authJwt.verifyToken, authJwt.isManager],
   controlleur.getNbrRdv_mois()
 );
+
+router.get('/statistique/ca-jour',[authJwt.verifyToken, authJwt.isManager],controlleur.getChiffreAffaire_jour())
+router.get('/statistique/ca-mois',[authJwt.verifyToken, authJwt.isManager],controlleur.getChiffreAffaire_mois())
 
 router
   .route("/manager/:id")
