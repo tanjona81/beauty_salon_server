@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/auth.config.js");
+const BlackToken = require('../schemas/Blacklist_tokenSchema.js')
 
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   // Extraction du token JWT du header Authorization
   const authHeader = req.get("Authorization");
 
@@ -23,6 +24,21 @@ const verifyToken = (req, res, next) => {
   // Le format est généralement "Bearer TOKEN"
   const token = authHeader.split(" ")[1];
 
+  // Verify if the token is already blacklisted for revoking token purpose
+  const blacklisted = await BlackToken.find({ token: token });
+  if(blacklisted.length > 0){
+    const responseData = {
+      status: false,
+      message: "Token expired",
+      details: null,
+      http_response: {
+        message: "Token expired",
+        code: 403,
+      },
+    };
+    return res.status(403).json(responseData);
+  }
+
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
       const responseData = {
@@ -36,6 +52,7 @@ const verifyToken = (req, res, next) => {
       };
       return res.status(401).json(responseData);
     }
+    req.user_id = decoded._id;
     req.role = decoded.role;
     next();
   });

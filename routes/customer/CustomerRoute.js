@@ -10,12 +10,14 @@ router.get(
 );
 router.post("/login", controlleur.loginCustomer());
 router.post("/create", controlleur.createCustomer());
-router.post("/payment", controlleur.payment());
+router.post("/payment", [authJwt.verifyToken, authJwt.isCustomer], controlleur.payment());
+router.get("/history/rendezvous", [authJwt.verifyToken, authJwt.isCustomer], controlleur.getHistoryRendezvous());
+router.get("/not-paid/rendezvous", [authJwt.verifyToken, authJwt.isCustomer], controlleur.getNotPaid());
 
 router
   .route("/customer/:id")
   .get([authJwt.verifyToken], controlleur.getCustomerById())
-  .put([authJwt.verifyToken], controlleur.updateCustomer())
+  .put([authJwt.verifyToken, authJwt.isCustomer], controlleur.updateCustomer())
   .delete(
     [authJwt.verifyToken, authJwt.isManager],
     controlleur.deleteCustomer()

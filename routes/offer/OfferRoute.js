@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const controlleur = require('../../controlleurs/offer/OfferControlleur.js')
+const { authJwt } = require("../../middlewares");
 
-router.get('/',controlleur.getOffer())
-router.post('/',controlleur.createOffer())
+router.get('/', [authJwt.verifyToken, authJwt.isManager], controlleur.getOffer())
+router.post('/', [authJwt.verifyToken, authJwt.isManager], controlleur.createOffer())
 
 router.route('/:id')
-    .get(controlleur.getOfferById())
-    .put(controlleur.updateOffer())
-    .delete(controlleur.deleteOffer())
+    .get([authJwt.verifyToken, authJwt.isManager], controlleur.getOfferById())
+    .put([authJwt.verifyToken, authJwt.isManager], controlleur.updateOffer())
+    .delete([authJwt.verifyToken, authJwt.isManager], controlleur.deleteOffer())
 
 module.exports = router;
