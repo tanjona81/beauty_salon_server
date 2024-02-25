@@ -40,6 +40,9 @@ router.get(
   controlleur.getNbrRdv_mois()
 );
 
+router.get('/statistique/ca-jour',[authJwt.verifyToken, authJwt.isManager],controlleur.getChiffreAffaire_jour())
+router.get('/statistique/ca-mois',[authJwt.verifyToken, authJwt.isManager],controlleur.getChiffreAffaire_mois())
+
 router
   .route("/manager/:id")
   .get([authJwt.verifyToken, authJwt.isManager], controlleur.getManagerById())

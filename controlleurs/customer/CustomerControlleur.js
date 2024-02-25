@@ -234,7 +234,7 @@ const updateCustomer = () => {
       // await mongoose.connect(uri)
       const { image, nom, prenom, tel, email, addresse, mdp } = req.body;
       await service
-        .update(req.params.id, image, nom, prenom, tel, email, addresse, mdp)
+        .update(req.user_id, image, nom, prenom, tel, email, addresse, mdp)
         .then((result) => {
           const responseData = {
             status: true,
@@ -339,17 +339,159 @@ const payment = () => {
       await service
         .payment(id_rendezvous)
         .then((result) => {
-          if (!result) return res.status(204).send("No match for the request");
+          // if (!result) return res.status(204).send("No match for the request");
+          const responseData = {
+            status: true,
+            message: "Rendezvous paid successfuly",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          console.log("Error : " + err.message);
+          return res.status(500).json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(
+            HttpStatus.INTERNAL_SERVER_ERROR
+          ),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      console.log("Error : " + e.message);
+      // await mongoose.disconnect()
+      return res.status(500).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
+const getHistoryRendezvous = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getHistoryRendezvous(req.user_id)
+        .then((result) => {
+          // if (!result) return res.status(204).send("No match for the request");
+          const responseData = {
+            status: true,
+            message: "Rendezvous history",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
           return res.status(200).json(result);
         })
         .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
           console.log("Error : " + err.message);
-          return res.status(500).send("Internal server error");
+          return res.status(500).json(responseData);
         });
     } catch (e) {
+      const responseData = {
+        status: false,
+        message: e,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(
+            HttpStatus.INTERNAL_SERVER_ERROR
+          ),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
       console.log("Error : " + e.message);
       // await mongoose.disconnect()
-      return res.status(500).send("Internal server error");
+      return res.status(500).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
+const getNotPaid = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      console.log(req.user_id)
+      await service
+        .getNotPaid(req.user_id)
+        .then((result) => {
+          // if (!result) return res.status(204).send("No match for the request");
+          const responseData = {
+            status: true,
+            message: "Rendezvous history",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(result);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          console.log("Error : " + err.message);
+          return res.status(500).json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(
+            HttpStatus.INTERNAL_SERVER_ERROR
+          ),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      console.log("Error : " + e.message);
+      // await mongoose.disconnect()
+      return res.status(500).json(responseData);
     } finally {
       // await mongoose.disconnect()
     }
@@ -364,4 +506,6 @@ module.exports = {
   deleteCustomer,
   loginCustomer,
   payment,
+  getHistoryRendezvous,
+  getNotPaid
 };

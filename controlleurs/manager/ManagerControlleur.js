@@ -495,18 +495,49 @@ const getChiffreAffaire_jour = () => {
             // await mongoose.connect(uri)
             await service.chiffreAffaire_jour()
             .then((result)=>{
-                if(result.length<=0) return res.status(204).send('No match for the request')
-                return res.status(200).json(result)
+              const responseData = {
+                status: true,
+                message: "ChiffreAffaire_jour",
+                details: result,
+                http_response: {
+                  message: HttpStatus.getStatusText(HttpStatus.OK),
+                  code: HttpStatus.OK,
+                },
+              };
+                // if(result.length<=0) return res.status(204).send('No match for the request')
+                return res.status(200).json(responseData)
                 
             })
             .catch((err) => {
+              const responseData = {
+                status: false,
+                message: err,
+                details: null,
+                http_response: {
+                  message: HttpStatus.getStatusText(
+                    HttpStatus.INTERNAL_SERVER_ERROR
+                  ),
+                  code: HttpStatus.INTERNAL_SERVER_ERROR,
+                },
+              };
                 console.log("Error : "+err.message)
-                return res.status(500).send('Internal server error')
+                return res.status(500).json(responseData)
             });
         }catch(e){
+          const responseData = {
+            status: false,
+            message: e,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
             console.log("Error : "+e.message)
             // await mongoose.disconnect()
-            return res.status(500).send('Internal server error')
+            return res.status(500).json(responseData)
         }finally{
             // await mongoose.disconnect()
         }
@@ -519,18 +550,49 @@ const getChiffreAffaire_mois = () => {
             // await mongoose.connect(uri)
             await service.chiffreAffaire_mois()
             .then((result)=>{
-                if(result.length<=0) return res.status(204).send('No match for the request')
-                return res.status(200).json(result)
+              const responseData = {
+                status: true,
+                message: "ChiffreAffaire_mois",
+                details: result,
+                http_response: {
+                  message: HttpStatus.getStatusText(HttpStatus.OK),
+                  code: HttpStatus.OK,
+                },
+              };
+                // if(result.length<=0) return res.status(204).send('No match for the request')
+                return res.status(200).json(responseData)
                 
             })
             .catch((err) => {
+              const responseData = {
+                status: false,
+                message: err,
+                details: null,
+                http_response: {
+                  message: HttpStatus.getStatusText(
+                    HttpStatus.INTERNAL_SERVER_ERROR
+                  ),
+                  code: HttpStatus.INTERNAL_SERVER_ERROR,
+                },
+              };
                 console.log("Error : "+err.message)
-                return res.status(500).send('Internal server error')
+                return res.status(500).json(responseData)
             });
         }catch(e){
+          const responseData = {
+            status: false,
+            message: e.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
             console.log("Error : "+e.message)
             // await mongoose.disconnect()
-            return res.status(500).send('Internal server error')
+            return res.status(500).json(responseData)
         }finally{
             // await mongoose.disconnect()
         }
@@ -543,18 +605,49 @@ const getCAMinusCost = () => {
             // await mongoose.connect(uri)
             await service.beneficeparmois(req.query.mois, req.query.loyer, req.query.piece, req.query.autres)
             .then((result)=>{
-                if(result.length<=0) return res.status(204).send('No match for the request')
+              const responseData = {
+                status: true,
+                message: "benefice par mois",
+                details: result,
+                http_response: {
+                  message: HttpStatus.getStatusText(HttpStatus.OK),
+                  code: HttpStatus.OK,
+                },
+              };
+                // if(result.length<=0) return res.status(204).send('No match for the request')
                 return res.status(200).json(result)
                 
             })
             .catch((err) => {
+              const responseData = {
+                status: false,
+                message: err.message,
+                details: null,
+                http_response: {
+                  message: HttpStatus.getStatusText(
+                    HttpStatus.INTERNAL_SERVER_ERROR
+                  ),
+                  code: HttpStatus.INTERNAL_SERVER_ERROR,
+                },
+              };
                 console.log("Error : "+err.message)
-                return res.status(500).send('Internal server error')
+                return res.status(500).json(responseData)
             });
         }catch(e){
+          const responseData = {
+            status: false,
+            message: e.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
             console.log("Error : "+e.message)
             // await mongoose.disconnect()
-            return res.status(500).send('Internal server error')
+            return res.status(500).josn(responseData)
         }finally{
             // await mongoose.disconnect()
         }
@@ -571,7 +664,7 @@ module.exports = {
   getTempsMoyenTravailPourChaqueEmpoye,
   getNbrRdv_jour,
   getNbrRdv_mois,
-    getChiffreAffaire_jour,
-    getChiffreAffaire_mois,
-    getCAMinusCost,
+  getChiffreAffaire_jour,
+  getChiffreAffaire_mois,
+  getCAMinusCost,
 };

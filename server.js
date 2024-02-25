@@ -21,10 +21,13 @@ const rendezvousRouter = require("./routes/rendezvous/RendezvousRoute.js");
 app.use("/api/rendezvous", rendezvousRouter);
 
 const preferenceRouter = require('./routes/preference/PreferenceRoute.js')
-app.use('/preferences',preferenceRouter)
+app.use('/api/preferences',preferenceRouter)
 
 const offerRouter = require('./routes/offer/OfferRoute.js')
-app.use('/offers',offerRouter)
+app.use('/api/offers',offerRouter)
+
+const Blacklist_tokenRouter = require('./routes/blacklist_token/Blacklist_tokenRoute.js')
+app.use('/api/blacklist',Blacklist_tokenRouter)
 
 app.listen(5000, () => {
   console.log("http://localhost:5000/");
