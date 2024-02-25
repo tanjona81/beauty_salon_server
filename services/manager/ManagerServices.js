@@ -9,7 +9,7 @@ const config = require("../../config/auth.config.js");
 const login = async (nom, mdp) => {
   const user = await Manager.findOne({ nom: nom });
   const test = await bcrypt.compare(mdp, user.mdp);
-  if (test) {
+  if (user && test) {
     const usertoken = {
       _id: user._id,
       nom: user.nom,

@@ -10,7 +10,6 @@ router.get(
 );
 router.post(
   "/login",
-  [authJwt.verifyToken, authJwt.isManager],
   controlleur.loginManager()
 );
 router.post(
