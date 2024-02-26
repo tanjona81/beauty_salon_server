@@ -26,8 +26,7 @@ const customerSchema = new mongoose.Schema({
     },
     mdp: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     created_at: {
         type: Date,
