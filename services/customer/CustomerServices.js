@@ -96,9 +96,14 @@ const payment = async (id_rendezvous) => {
   pay.id_rendezvous = id_rendezvous;
   pay.id_customer = rdv[0].id_customer;
   pay.id_service = rdv[0].id_service._id;
-  pay.prix =
-    rdv[0].id_service.prix -
-    rdv[0].id_service.prix * (offer[0].reduction / 100);
+  pay.prix = rdv[0].id_service.prix;
+  if(offer.length > 0){
+    console.log('Offer')
+    pay.prix =
+      rdv[0].id_service.prix -
+      rdv[0].id_service.prix * (offer[0].reduction / 100);
+  }
+  
   pay.save();
 
   return pay;

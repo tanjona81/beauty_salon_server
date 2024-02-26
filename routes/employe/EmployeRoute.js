@@ -12,22 +12,22 @@ router.post(
 
 router.post("/login", controlleur.loginEmploye());
 router.get(
-  "/rendezvous/:id",
+  "/rendezvous/",
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.getRendezvousEmploye()
 );
 router.get(
-  "/rendezvousdone/:id",
+  "/rendezvousdone/",
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.getDoneRendezvousEmploye()
 );
 router.put(
-  "/rendezvousvalidate/:id",
+  "/rendezvousvalidate/",
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.validate_rendezvous()
 );
 router.get(
-  "/commission/:id",
+  "/commission/",
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.getCommission()
 );
