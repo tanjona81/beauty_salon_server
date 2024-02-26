@@ -30,8 +30,7 @@ const employeSchema = new mongoose.Schema({
     },
     mdp: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     heure_debut: {
         type: String,

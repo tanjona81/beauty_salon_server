@@ -155,7 +155,7 @@ const getHistoryRendezvous = async (id_customer) => {
               then: "not paid",
               else: "paid"
           }
-      }
+        }
       }
     },
     {

@@ -107,7 +107,7 @@ const nbrReservation_jour = async () => {
 };
 
 const nbrReservation_mois = async () => {
-  return await RdvTracking.aggregate([
+  const rdv_mois = await RdvTracking.aggregate([
     {
       $group: {
         _id: { year: { $year: "$date" }, month: { $month: "$date" } },
@@ -115,6 +115,27 @@ const nbrReservation_mois = async () => {
       },
     },
   ]);
+
+  const month = [
+    { value: 0, name: "Janvie", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Fevrier", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Mars", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Avril", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Mais", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Juin", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Juillet", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Aout", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Septembre", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Octobre", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Novembre", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Decembre", year : rdv_mois[0]._id.year },
+  ]
+
+    for(let i=0;i<rdv_mois.length;i++){
+      month[rdv_mois[i]._id.month].value = rdv_mois[i].count
+    }
+
+  return month
 };
 
 const chiffreAffaire_jour = async () => {

@@ -1,6 +1,7 @@
 const uri = require('../../config/DbConfig.js')
 const mongoose = require('mongoose');
 const service = require('../../services/preference/PreferenceServices.js')
+const HttpStatus = require("http-status-codes");
 
 const getPreference = () => {
     return(async (req,res)=>{
@@ -394,6 +395,61 @@ const getPreferenceService = () => {
     })
 }
 
+const getAllServicePlusPreference = () => {
+  return(async (req,res)=>{
+      try{
+          // await mongoose.connect(uri)
+          await service.all_service_plus_prefere(req.user_id)
+          .then((result)=>{
+              const responseData = {
+                  status: true,
+                  message: "List of services prefered",
+                  details: result,
+                  http_response: {
+                    message: HttpStatus.getStatusText(HttpStatus.OK),
+                    code: HttpStatus.OK,
+                  },
+                };
+              // if(!result) return res.status(204).send('No match for the request')
+              return res.status(200).json(responseData)
+              
+          })
+          .catch((err) => {
+              const responseData = {
+                  status: false,
+                  message: err,
+                  details: null,
+                  http_response: {
+                    message: HttpStatus.getStatusText(
+                      HttpStatus.INTERNAL_SERVER_ERROR
+                    ),
+                    code: HttpStatus.INTERNAL_SERVER_ERROR,
+                  },
+                };
+              console.log("Error : "+err.message)
+              return res.status(500).json(responseData)
+          });
+      }catch(e){
+          const responseData = {
+              status: false,
+              message: e,
+              details: null,
+              http_response: {
+                message: HttpStatus.getStatusText(
+                  HttpStatus.INTERNAL_SERVER_ERROR
+                ),
+                code: HttpStatus.INTERNAL_SERVER_ERROR,
+              },
+            };
+          console.log("Error : "+e.message)
+          // await mongoose.disconnect()
+          return res.status(500).json(responseData)
+      }finally{
+          // await mongoose.disconnect()
+      }
+  })
+}
+
 module.exports = {
     getPreference,
     getPreferenceById,
@@ -401,5 +457,6 @@ module.exports = {
     updatePreference,
     deletePreference,
     getPreferenceEmploye,
-    getPreferenceService
+    getPreferenceService,
+    getAllServicePlusPreference
 }
