@@ -1,5 +1,7 @@
 const service = require("../../services/customer/CustomerServices.js");
 const HttpStatus = require("http-status-codes");
+const jwt = require("jsonwebtoken");
+const config = require("../../config/auth.config.js");
 
 const loginCustomer = () => {
   return async (req, res) => {
@@ -184,10 +186,19 @@ const createCustomer = () => {
       await service
         .create(image, nom, prenom, tel, email, addresse, mdp)
         .then((result) => {
+          const usertoken = {
+            _id: result._id,
+            nom: result.nom,
+            role: "customer",
+          };
+          const accessToken = jwt.sign(usertoken, config.secret);
           const responseData = {
             status: true,
             message: "Customer successfully created",
-            details: result,
+            details: {
+              customer: result,
+              token: accessToken,
+            },
             http_response: {
               message: HttpStatus.getStatusText(HttpStatus.OK),
               code: HttpStatus.OK,
@@ -372,9 +383,7 @@ const payment = () => {
         message: e,
         details: null,
         http_response: {
-          message: HttpStatus.getStatusText(
-            HttpStatus.INTERNAL_SERVER_ERROR
-          ),
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
       };
@@ -427,9 +436,7 @@ const getHistoryRendezvous = () => {
         message: e,
         details: null,
         http_response: {
-          message: HttpStatus.getStatusText(
-            HttpStatus.INTERNAL_SERVER_ERROR
-          ),
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
       };
@@ -446,7 +453,6 @@ const getNotPaid = () => {
   return async (req, res) => {
     try {
       // await mongoose.connect(uri)
-      console.log(req.user_id)
       await service
         .getNotPaid(req.user_id)
         .then((result) => {
@@ -483,9 +489,7 @@ const getNotPaid = () => {
         message: e,
         details: null,
         http_response: {
-          message: HttpStatus.getStatusText(
-            HttpStatus.INTERNAL_SERVER_ERROR
-          ),
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
           code: HttpStatus.INTERNAL_SERVER_ERROR,
         },
       };
@@ -507,5 +511,5 @@ module.exports = {
   loginCustomer,
   payment,
   getHistoryRendezvous,
-  getNotPaid
+  getNotPaid,
 };
