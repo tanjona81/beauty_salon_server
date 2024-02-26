@@ -6,8 +6,9 @@ const { authJwt } = require("../../middlewares");
 router.get('/', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreference())
 router.post('/', [authJwt.verifyToken, authJwt.isCustomer], controlleur.createPreference())
 
-router.get('/employes/:id', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceEmploye())
-router.get('/services/:id', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceService())
+router.get('/employes', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceEmploye())
+router.get('/services', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceService())
+router.get('/all-services', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getAllServicePlusPreference())
 
 router.route('/:id')
     .get([authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceById())

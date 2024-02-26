@@ -1,4 +1,5 @@
 const Preference = require('../../schemas/PreferenceSchema.js')
+const Service = require('../../schemas/ServiceSchema.js')
 const mongoose = require('mongoose')
 
 const getAll = async () => {
@@ -87,6 +88,59 @@ const service_prefere = async (id_customer) => {
     ]);
 }
 
+const all_service_plus_prefere = async (id_customer) => {
+    const _id_customer = new mongoose.Types.ObjectId(id_customer);
+    return await Service.aggregate([
+        {
+            $lookup: {
+                from: 'preferences',
+                localField: '_id',
+                foreignField: 'id_prefere',
+                as: 'preferences'
+            }
+        },
+        {
+            $unwind: { path: "$preferences", preserveNullAndEmptyArrays: true }
+        },
+        {
+            $addFields:{
+                is_prefered: {
+                  $cond: {
+                      if: { $eq: [{ $ifNull: ["$preferences", null] }, null] },
+                      then: false,
+                      else: true
+                  }
+                }
+              }
+        }
+    ]);
+    // return await Preference.aggregate([
+    //     {
+    //         $match: {
+    //             id_customer: _id_customer,
+    //             designation: "service"
+    //         }
+    //     },
+    //     {
+    //         $lookup: {
+    //             from: 'services',
+    //             localField: 'id_prefere',
+    //             foreignField: '_id',
+    //             as: 'services'
+    //         }
+    //     },
+    //     {
+    //         $unwind: { path: "$services" }
+    //     },
+    //     {
+    //         $project: {
+    //             _id: 0,
+    //             services: "$services"
+    //         }
+    //     }
+    // ]);
+}
+
 module.exports = {
     getAll,
     getById,
@@ -94,5 +148,6 @@ module.exports = {
     update,
     delete_preference,
     employe_prefere,
-    service_prefere
+    service_prefere,
+    all_service_plus_prefere
 }
