@@ -1,5 +1,6 @@
 const Manager = require("../../schemas/ManagerSchema.js");
 const Rendezvous = require("../../schemas/RendezvousSchema.js");
+const Employe = require("../../schemas/EmployeSchema.js");
 const Payment = require("../../schemas/PaymentSchema.js");
 const RdvTracking = require("../../schemas/RendezvoustrackingSchema.js");
 const bcrypt = require("bcrypt");
@@ -62,48 +63,111 @@ const delete_manager = async (id) => {
 };
 
 const getTempsMoyenTravailPourChaqueEmpoye = async () => {
-  return Rendezvous.aggregate([
+  return Employe.aggregate([
     {
-      $match: {
-        is_valid: 1,
+      $lookup: {
+        from: "rendezvous",
+        localField: "_id",
+        foreignField: "id_employe",
+        as: "rendezvous",
       },
+    },
+    {
+      $unwind: { path: "$rendezvous", preserveNullAndEmptyArrays: true},
     },
     {
       $lookup: {
         from: "services",
-        localField: "id_service",
+        localField: "rendezvous.id_service",
         foreignField: "_id",
-        as: "service",
+        as: "services",
       },
     },
     {
-      $unwind: { path: "$service" },
+      $unwind: { path: "$services", preserveNullAndEmptyArrays: true},
+    },
+    {
+      $match: {
+        $expr:{
+          $or: [
+            { $eq: ["$rendezvous.is_valid", 1] },
+            {$eq: [{ $ifNull: ["$rendezvous", null] }, null]}
+          ],
+        },
+      },
     },
     {
       $group: {
-        _id: "$id_employe",
-        moyenne: { $avg: "$service.duree" },
+        _id: "$_id",
+        image: { $first: "$image" },
+        nom: { $first: "$nom" },
+        email: { $first: "$email" },
+        tel: { $first: "$tel" },
+        created_at: { $first: "$created_at" },
+        moyenne: { $avg: "$services.duree" },
       },
     },
     {
       $project: {
-        _id: "$_id",
-        moyenne: 1,
+        _id: 1,
+        image: 1,
+        nom: 1,
+        email: 1,
+        tel: 1,
+        created_at: 1,
+        moyenne: {
+          $cond: {
+              if: { $eq: ["$moyenne", null] },
+              then: 0,
+              else: "$moyenne"
+          }
+        },
       },
     },
+    {
+      $sort:{
+        moyenne: -1
+      }
+    }
   ]);
 };
 
 const nbrReservation_jour = async () => {
-  return await RdvTracking.aggregate([
+  const rdv_day = await RdvTracking.aggregate([
+    {
+      $match: {
+        $expr: {
+          $eq: [{ $month: "$date" }, { $month: new Date() }],
+        },
+      }
+    },
     {
       $group: {
-        _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+        // _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+        _id: { year: { $year: "$date" }, month: { $month: "$date" }, day: { $dayOfMonth: "$date" } },
         count: { $sum: 1 },
       },
-    },
-    
+    }
   ]);
+
+  const last_day = getLastDayOfMonth(rdv_day[0]._id.year,rdv_day[0]._id.month)
+
+  let rep = [];
+
+  for(let i=0;i<last_day;i++){
+    rep[i] = { 
+      value: 0, 
+      name: i+1, 
+      year : rdv_day[0]._id.year 
+    }
+  }
+
+  // push the data from databse into rep[]
+  for(let i=0;i<rdv_day.length;i++){
+    rep[ rdv_day[i]._id.day -1 ].value = rdv_day[i].count
+  }
+
+  return rep
 };
 
 const nbrReservation_mois = async () => {
@@ -117,7 +181,7 @@ const nbrReservation_mois = async () => {
   ]);
 
   const month = [
-    { value: 0, name: "Janvie", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Janvier", year : rdv_mois[0]._id.year },
     { value: 0, name: "Fevrier", year : rdv_mois[0]._id.year },
     { value: 0, name: "Mars", year : rdv_mois[0]._id.year },
     { value: 0, name: "Avril", year : rdv_mois[0]._id.year },
@@ -132,27 +196,54 @@ const nbrReservation_mois = async () => {
   ]
 
     for(let i=0;i<rdv_mois.length;i++){
-      month[rdv_mois[i]._id.month].value = rdv_mois[i].count
+      month[rdv_mois[i]._id.month - 1].value = rdv_mois[i].count
     }
 
   return month
 };
 
 const chiffreAffaire_jour = async () => {
-  return await Payment.aggregate([
+  const CA_jour = await Payment.aggregate([
+    {
+      $match: {
+        $expr: {
+          $eq: [{ $month: "$created_at" }, { $month: new Date() }],
+        },
+      }
+    },
     {
       $group: {
-        _id: { $dateToString: { format: "%Y-%m-%d", date: "$created_at" } },
+        // _id: { $dateToString: { format: "%Y-%m-%d", date: "$created_at" } },
+        _id: { year: { $year: "$created_at" }, month: { $month: "$created_at" }, day: { $dayOfMonth: "$created_at" } },
         chiffre: {
           $sum: "$prix",
         },
       },
     }
   ]);
+
+  const last_day = getLastDayOfMonth(CA_jour[0]._id.year,CA_jour[0]._id.month)
+
+  let rep = [];
+
+  for(let i=0;i<last_day;i++){
+    rep[i] = { 
+      value: 0, 
+      name: i+1, 
+      year : CA_jour[0]._id.year 
+    }
+  }
+
+  // push the data from databse into rep[]
+  for(let i=0;i<CA_jour.length;i++){
+    rep[ CA_jour[i]._id.day -1 ].value = CA_jour[i].chiffre
+  }
+
+  return rep;
 };
 
 const chiffreAffaire_mois = async () => {
-  return await Payment.aggregate([
+  const CA_mois = await Payment.aggregate([
     {
       $group: {
         _id: {
@@ -165,6 +256,27 @@ const chiffreAffaire_mois = async () => {
       },
     }
   ]);
+
+  const month = [
+    { value: 0, name: "Janvier", year : CA_mois[0]._id.year },
+    { value: 0, name: "Fevrier", year : CA_mois[0]._id.year },
+    { value: 0, name: "Mars", year : CA_mois[0]._id.year },
+    { value: 0, name: "Avril", year : CA_mois[0]._id.year },
+    { value: 0, name: "Mais", year : CA_mois[0]._id.year },
+    { value: 0, name: "Juin", year : CA_mois[0]._id.year },
+    { value: 0, name: "Juillet", year : CA_mois[0]._id.year },
+    { value: 0, name: "Aout", year : CA_mois[0]._id.year },
+    { value: 0, name: "Septembre", year : CA_mois[0]._id.year },
+    { value: 0, name: "Octobre", year : CA_mois[0]._id.year },
+    { value: 0, name: "Novembre", year : CA_mois[0]._id.year },
+    { value: 0, name: "Decembre", year : CA_mois[0]._id.year },
+  ]
+
+    for(let i=0;i<CA_mois.length;i++){
+      month[CA_mois[i]._id.month-1].value = CA_mois[i].chiffre
+    }
+
+  return month
 };
 
 const beneficeparmois = async (mois, loyer, piece, autres) => {
@@ -256,6 +368,16 @@ const beneficeparmois = async (mois, loyer, piece, autres) => {
 
   return rep;
 };
+
+function getLastDayOfMonth(year, month) {
+  // Create a new Date object set to the first day of the next month
+  // pointer of month begin ato 0 so month +1 = month
+  const nextMonth = new Date(year, month, 1);
+  // Subtract one day from the next month to get the last day of the current month
+  const lastDayOfMonth = new Date(nextMonth - 1);
+  // Return the date component of the last day of the month
+  return lastDayOfMonth.getDate();
+}
 
 module.exports = {
   getAll,
