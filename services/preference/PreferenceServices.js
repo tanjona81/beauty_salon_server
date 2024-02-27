@@ -135,7 +135,12 @@ const all_service_plus_prefere = async (id_customer) => {
               created_at: { $first: "$created_at" },
               is_prefered: { $first: "$is_prefered" },
             },
-          },
+        },
+        {
+            $sort:{
+                created_at: -1
+            }
+        },
         // {
         //     $match: {
         //         $or: [
