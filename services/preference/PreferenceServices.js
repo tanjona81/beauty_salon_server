@@ -30,6 +30,10 @@ const delete_preference = async (id) => {
     return await Preference.deleteOne({ _id : id });
 }
 
+const find_and_delete_preference = async (id_customer, id_prefere, designation) => {
+    return await Preference.findOneAndDelete({ id_customer, id_prefere, designation });
+}
+
 const employe_prefere = async (id_customer) => {
     const _id_customer = new mongoose.Types.ObjectId(id_customer);
     return await Preference.aggregate([
@@ -149,5 +153,6 @@ module.exports = {
     delete_preference,
     employe_prefere,
     service_prefere,
-    all_service_plus_prefere
+    all_service_plus_prefere,
+    find_and_delete_preference
 }
