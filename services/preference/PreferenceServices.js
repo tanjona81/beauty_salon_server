@@ -116,6 +116,22 @@ const all_service_plus_prefere = async (id_customer) => {
                 }
               }
         },
+        {
+            $sort:{
+                is_prefered: -1
+            }
+        },
+        {
+            $group: {
+              _id: "$_id",
+              nom: { $first: "$nom" },
+              prix: { $first: "$prix" },
+              duree: { $first: "$duree" },
+              commission: { $first: "$commission" },
+              created_at: { $first: "$created_at" },
+              is_prefered: { $first: "$is_prefered" },
+            },
+          },
         // {
         //     $match: {
         //         $or: [
