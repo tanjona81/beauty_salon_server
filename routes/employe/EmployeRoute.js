@@ -3,7 +3,7 @@ const router = express.Router();
 const controlleur = require("../../controlleurs/employe/EmployeControlleur.js");
 const { authJwt } = require("../../middlewares");
 
-router.get("/list", [authJwt.verifyToken, authJwt.isManager], controlleur.getEmploye());
+router.get("/list", [authJwt.verifyToken], controlleur.getEmploye());
 router.post(
   "/create",
   [authJwt.verifyToken, authJwt.isManager],
