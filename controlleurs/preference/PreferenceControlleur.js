@@ -121,57 +121,58 @@ const getPreferenceById = () => {
 };
 
 const createPreference = () => {
-  return async (req, res) => {
-    try {
-      // await mongoose.connect(uri)
-      const { id_customer, id_prefere, designation } = req.body;
-      await service
-        .create(id_customer, id_prefere, designation)
-        .then((result) => {
-          const responseData = {
-            status: true,
-            message: "Preference created successfully",
-            details: result,
-            http_response: {
-              message: HttpStatus.getStatusText(HttpStatus.OK),
-              code: HttpStatus.OK,
-            },
-          };
-          return res.status(201).json(result);
-        })
-        .catch((err) => {
-          const responseData = {
-            status: false,
-            message: err,
-            details: null,
-            http_response: {
-              message: HttpStatus.getStatusText(
-                HttpStatus.INTERNAL_SERVER_ERROR
-              ),
-              code: HttpStatus.INTERNAL_SERVER_ERROR,
-            },
-          };
-          console.log("Error : " + err.message);
-          return res.status(500).json(responseData);
-        });
-    } catch (e) {
-      const responseData = {
-        status: false,
-        message: e,
-        details: null,
-        http_response: {
-          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
-          code: HttpStatus.INTERNAL_SERVER_ERROR,
-        },
-      };
-      console.log("Error : " + e.message);
-      // await mongoose.disconnect()
-      return res.status(500).json(responseData);
-    } finally {
-      // await mongoose.disconnect()
-    }
-  };
-};
+    return (async (req,res)=>{
+        try{
+            // await mongoose.connect(uri)
+            const {id_prefere, designation} = req.body;
+            await service.create(req.user_id, id_prefere, designation)
+            .then((result)=>{
+                const responseData = {
+                    status: true,
+                    message: "Preference created successfully",
+                    details: result,
+                    http_response: {
+                      message: HttpStatus.getStatusText(HttpStatus.OK),
+                      code: HttpStatus.OK,
+                    },
+                  };
+                return res.status(201).json(result)
+            })
+            .catch((err) => {
+                const responseData = {
+                    status: false,
+                    message: err,
+                    details: null,
+                    http_response: {
+                      message: HttpStatus.getStatusText(
+                        HttpStatus.INTERNAL_SERVER_ERROR
+                      ),
+                      code: HttpStatus.INTERNAL_SERVER_ERROR,
+                    },
+                  };
+                console.log("Error : "+err.message)
+                return res.status(500).json(responseData)                
+            });
+        }catch(e){
+            const responseData = {
+                status: false,
+                message: e,
+                details: null,
+                http_response: {
+                  message: HttpStatus.getStatusText(
+                    HttpStatus.INTERNAL_SERVER_ERROR
+                  ),
+                  code: HttpStatus.INTERNAL_SERVER_ERROR,
+                },
+              };
+            console.log("Error : "+e.message)
+            // await mongoose.disconnect()
+            return res.status(500).json(responseData)
+        }finally{
+            // await mongoose.disconnect()
+        }
+    })
+}
 
 const updatePreference = () => {
   return async (req, res) => {

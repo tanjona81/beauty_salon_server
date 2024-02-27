@@ -110,27 +110,30 @@ const all_service_plus_prefere = async (id_customer) => {
             $addFields:{
                 is_prefered: {
                   $cond: {
-                      if: { $eq: [{ $ifNull: ["$preferences", null] }, null] },
+                      if: { $or: [
+                        { $eq: [{ $ifNull: ["$preferences", null] }, null] },
+                        { $ne: ["$preferences.id_customer", _id_customer] }
+                      ] },
                       then: false,
                       else: true
                   }
                 }
               }
         },
-        {
-            $match: {
-                $or: [
-                    {
-                        $and: [
-                            {$expr:{ $eq:["$preferences.id_customer", _id_customer] } },
-                            {$expr:{ $eq:["$preferences.designation", "service"] } }
-                        ]
-                    },
-                    { $expr:{ $eq: [{ $ifNull: ["$preferences", null] }, null] } }
-                ]
+        // {
+        //     $match: {
+        //         $or: [
+        //             {
+        //                 $and: [
+        //                     {$expr:{ $eq:["$preferences.id_customer", _id_customer] } },
+        //                     {$expr:{ $eq:["$preferences.designation", "service"] } }
+        //                 ]
+        //             },
+        //             { $expr:{ $eq: [{ $ifNull: ["$preferences", null] }, null] } }
+        //         ]
                 
-            }
-        },
+        //     }
+        // },
     ]);
     // return await Preference.aggregate([
     //     {
