@@ -11,6 +11,7 @@ router.post('/delete', [authJwt.verifyToken, authJwt.isCustomer], controlleur.fi
 router.get('/employes', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceEmploye())
 router.get('/services', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceService())
 router.get('/all-services', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getAllServicePlusPreference())
+router.get('/all-employes', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getAllEmployePlusPreference())
 
 router.route('/:id')
     .get([authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceById())
