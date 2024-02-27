@@ -8,7 +8,16 @@ router.get(
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.getRendezvous()
 );
+router.get(
+  "/list/rendezvous-no-employe",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.getRendezvousNoEmploye()
+);
+
 router.post("/create", [authJwt.verifyToken], controlleur.createRendezvous());
+
+router.post("/create/rendezvous-no-employe", [authJwt.verifyToken, authJwt.isCustomer], 
+  controlleur.createRendezvousNoEmploye());
 
 router
   .route("/rendezvous/:id")

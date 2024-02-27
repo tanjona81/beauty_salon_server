@@ -26,6 +26,13 @@ router.put(
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.validate_rendezvous()
 );
+
+router.put(
+  "/accept/rendezvous",
+  [authJwt.verifyToken, authJwt.isEmploye],
+  controlleur.acceptRdvNoEmploye()
+);
+
 router.get(
   "/commission/",
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
