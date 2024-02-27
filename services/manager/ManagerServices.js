@@ -348,15 +348,12 @@ const beneficeparmois = async (mois, loyer, piece, autres) => {
       },
     },
   ]);
-
-  // console.log(CA_minus_commission[0].chiffre)
-  // console.log(paid[0].chiffre)
-  // console.log((CA_minus_commission[0].chiffre + loyer + piece + autres))
+  
   let paid_chiffre = 0
-  if(paid.length > 0) paid_chiffre = paid[0].chiffre
+  if(paid.length > 0) paid_chiffre = Number(paid[0].chiffre.toFixed(2))
   
   let CA_minus_commission_chiffre = 0
-  if(CA_minus_commission.length > 0) paid_chiffre = CA_minus_commission[0].chiffre
+  if(CA_minus_commission.length > 0) CA_minus_commission_chiffre = Number(CA_minus_commission[0].chiffre.toFixed(2))
 
   const rep = {
     mois: mois,
@@ -364,6 +361,8 @@ const beneficeparmois = async (mois, loyer, piece, autres) => {
     CA:
       paid_chiffre -
       (CA_minus_commission_chiffre + loyer + piece + autres),
+    salaire: CA_minus_commission_chiffre,
+    payment: paid_chiffre
   };
 
   return rep;

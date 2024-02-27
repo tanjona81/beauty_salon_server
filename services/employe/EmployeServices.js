@@ -1,6 +1,7 @@
 const Employe = require("../../schemas/EmployeSchema.js");
 const Customer = require("../../schemas/CustomerSchema.js");
 const Rendezvous = require("../../schemas/RendezvousSchema.js");
+const Service = require('../../schemas/ServiceSchema.js')
 const cron = require("node-cron");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -133,7 +134,7 @@ const validate_rendezvous = async (id_rendezvous) => {
     rdv.date_heure.toTimeString().slice(0, 8)
   );
 
-  // send a reminder email to the customer
+  // send a reminder email to the customer 1mn after
   cron.schedule(
     `${date_plus_1mn.getMinutes()} ${date_plus_1mn.getHours()} ${date_plus_1mn.getDate()} 
     ${date_plus_1mn.getMonth() + 1} *`,
@@ -205,6 +206,110 @@ const commission_per_day = async (id_employe) => {
   ]);
 };
 
+const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
+  const rdv = await Rendezvous.findById(id_rendezvous);
+  const date_plus_1mn = new Date(rdv.date_heure.getTime() - 1 * 60000);
+  const customer = await Customer.findById(rdv.id_customer);
+  const employe = await Employe.findOne({_id : id_employe});
+  const service = await Service.findOne({_id : rdv.id_service})
+
+  // Convert the date_heure parameter into Date
+  const date = new Date(rdv.date_heure)
+
+  // date_heure + service.duree
+  let date_heure_plus_duree = new Date(date.getTime() + service.duree * 60000)
+
+  const time_debut = utils.stringToTime(employe.heure_debut)
+  const time_fin = utils.stringToTime(employe.heure_fin)
+
+  // Consvert the date_heure parameter into string Y-M-D
+  const formatted_date_string = date.toISOString().slice(0, 10)
+
+  // Convert id_employe into objectId
+  const _id_employe = new mongoose.Types.ObjectId(id_employe);
+
+  const rendezvous_valid = await Rendezvous.aggregate([
+      {
+          $match:{
+              id_employe: _id_employe,
+              is_valid: 1,
+              $expr: {
+                  $eq: [
+                      { $dateToString: { format: "%Y-%m-%d", date: "$date_heure" } },
+                      formatted_date_string
+                  ]
+              }
+          }
+
+      },
+      {
+          $lookup: {
+              from: 'services',
+              localField: 'id_service',
+              foreignField: '_id',
+              as: 'service'
+          }
+      },
+      {
+          $unwind: { path: "$service" }
+      },
+      {
+          $project: {
+              _id: 0,
+              id_employe: 1,
+              date_heure: 1,
+              "service.duree": 1
+          }
+      }
+  ])
+
+  // Check if the employe work on the parameter date
+  if(date.getTime() < time_debut.getTime() || date.getTime() > time_fin.getTime()
+      || date_heure_plus_duree.getTime() > time_fin.getTime()) 
+      return {message:`${employe.nom} doesn't work on this date`}
+  
+  // console.log(rendezvous_valid)
+  for(let i=0;i<rendezvous_valid.length;i++){
+      let rendezvousdate_plus_duree = new Date(rendezvous_valid[i].date_heure.getTime() + rendezvous_valid[i].service.duree * 60000)
+      // console.log(rendezvous_valid[i].date_heure.getTime())
+      // console.log(date.getTime())
+      // console.log(rendezvousdate_plus_duree.getTime())
+
+      // Check if date between a valid rendezvous and a valid rendezvous + duree of the service
+      // Check if date_heure_plus_duree between a valid rendezvous and a valid rendezvous + duree of the service
+      if((date.getTime() >= rendezvous_valid[i].date_heure && date.getTime() <= rendezvousdate_plus_duree) ||
+          (date_heure_plus_duree.getTime() >= rendezvous_valid[i].date_heure && 
+          date_heure_plus_duree.getTime() <= rendezvousdate_plus_duree))
+          return {message:`${employe.nom} has already a meeting on this date`}
+  }
+
+  // Send validation email to the customer
+  sendmail.validation(
+    customer.email,
+    customer.nom,
+    rdv.date_heure.toISOString().slice(0, 10),
+    rdv.date_heure.toTimeString().slice(0, 8)
+  );
+
+  // send a reminder email to the customer 1mn after
+  cron.schedule(
+    `${date_plus_1mn.getMinutes()} ${date_plus_1mn.getHours()} ${date_plus_1mn.getDate()} 
+    ${date_plus_1mn.getMonth() + 1} *`,
+    () => {
+      sendmail.reminder(
+        customer.email,
+        customer.nom,
+        rdv.date_heure.toISOString().slice(0, 10),
+        rdv.date_heure.toTimeString().slice(0, 8)
+      );
+    }
+  );
+
+  rdv.id_employe = id_employe
+  rdv.is_valid = 1;
+  return rdv;
+};
+
 module.exports = {
   getAll,
   getById,
@@ -216,4 +321,5 @@ module.exports = {
   getDoneRendezvous,
   validate_rendezvous,
   commission_per_day,
+  accept_rendezvous_no_employe
 };

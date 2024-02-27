@@ -70,7 +70,7 @@ const create = async (id_customer, id_service, id_employe, date_heure) =>  {
     // Check if the employe work on the parameter date
     if(date.getTime() < time_debut.getTime() || date.getTime() > time_fin.getTime()
         || date_heure_plus_duree.getTime() > time_fin.getTime()) 
-        return {message:`${employe.nom} doesn\'t work on this date`}
+        return {message:`${employe.nom} doesn't work on this date`}
     
     // console.log(rendezvous_valid)
     for(let i=0;i<rendezvous_valid.length;i++){
@@ -116,10 +116,39 @@ const delete_rendezvous = async (id) => {
     return await Rendezvous.deleteOne({ _id : id });
 }
 
+const create_rdv_no_employe = async (id_customer, id_service, date_heure) =>  {
+    let rendezvous = new Rendezvous();
+    rendezvous.id_customer = id_customer
+    rendezvous.id_service = id_service
+    rendezvous.date_heure = date_heure
+    const rdvsave = await rendezvous.save();
+    
+    // Insert into rdv tracking
+    let track = new RdvTracking();
+    await track.save();
+
+    return rdvsave;
+    // return "ok";
+}
+
+const get_rdv_no_employe = async () => {
+    return await Rendezvous.aggregate([
+        {
+            $match:{
+                $expr: {
+                    $eq: [{ $ifNull: ["$id_employe", null] }, null]
+                }
+            }
+        },
+    ])
+}
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
-    delete_rendezvous
+    delete_rendezvous,
+    create_rdv_no_employe,
+    get_rdv_no_employe
 }

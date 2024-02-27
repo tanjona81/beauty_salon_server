@@ -13,8 +13,7 @@ const rendezvousSchema = new mongoose.Schema({
     },
     id_employe: {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: "employe",
-        required: true
+        ref: "employe"
     },
     date_heure: {
         type: Date,
