@@ -29,7 +29,7 @@ const getById = async (id) => {
   return await Customer.findOne({ _id: id });
 };
 
-const create = async (image, nom, prenom, tel, email, addresse, mdp) => {
+const create = async (image, nom, prenom, sexe, tel, email, addresse, mdp) => {
   // Generate a salt
   const saltRounds = 10;
   const salt = await bcrypt.genSalt(saltRounds);
@@ -42,13 +42,14 @@ const create = async (image, nom, prenom, tel, email, addresse, mdp) => {
   customer.nom = nom;
   customer.mdp = hashedmdp;
   customer.prenom = prenom;
+  customer.sexe = sexe;
   customer.tel = tel;
   customer.email = email;
   customer.addresse = addresse;
   return await customer.save();
 };
 
-const update = async (id, image, nom, prenom, tel, email, addresse, mdp) => {
+const update = async (id, image, nom, prenom, sexe, tel, email, addresse, mdp) => {
   let customer = await Customer.findById(id);
   if (image !== undefined) customer.image = image;
   if (nom !== undefined) customer.nom = nom;
@@ -62,6 +63,7 @@ const update = async (id, image, nom, prenom, tel, email, addresse, mdp) => {
     customer.mdp = hashedmdp;
   }
   if (prenom !== undefined) customer.prenom = prenom;
+  if (sexe !== undefined) customer.sexe = sexe;
   if (tel !== undefined) customer.tel = tel;
   if (email !== undefined) customer.email = email;
   if (addresse !== undefined) customer.addresse = addresse;

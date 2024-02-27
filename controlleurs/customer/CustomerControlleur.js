@@ -182,9 +182,9 @@ const createCustomer = () => {
   return async (req, res) => {
     try {
       // await mongoose.connect(uri)
-      const { image, nom, prenom, tel, email, addresse, mdp } = req.body;
+      const { image, nom, prenom, sexe, tel, email, addresse, mdp } = req.body;
       await service
-        .create(image, nom, prenom, tel, email, addresse, mdp)
+        .create(image, nom, prenom, sexe, tel, email, addresse, mdp)
         .then((result) => {
           const usertoken = {
             _id: result._id,
@@ -243,9 +243,9 @@ const updateCustomer = () => {
   return async (req, res) => {
     try {
       // await mongoose.connect(uri)
-      const { image, nom, prenom, tel, email, addresse, mdp } = req.body;
+      const { image, nom, prenom, sexe, tel, email, addresse, mdp } = req.body;
       await service
-        .update(req.user_id, image, nom, prenom, tel, email, addresse, mdp)
+        .update(req.user_id, image, nom, prenom, sexe, tel, email, addresse, mdp)
         .then((result) => {
           const responseData = {
             status: true,

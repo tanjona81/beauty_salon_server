@@ -34,6 +34,7 @@ const create = async (
   image,
   nom,
   prenom,
+  sexe,
   tel,
   email,
   addresse,
@@ -53,6 +54,7 @@ const create = async (
   employe.nom = nom;
   employe.mdp = hashedmdp;
   employe.prenom = prenom;
+  employe.sexe = sexe;
   employe.tel = tel;
   employe.email = email;
   employe.addresse = addresse;
@@ -66,6 +68,7 @@ const update = async (
   image,
   nom,
   prenom,
+  sexe,
   tel,
   email,
   addresse,
@@ -86,6 +89,7 @@ const update = async (
     employe.mdp = hashedmdp;
   }
   if (prenom !== undefined) employe.prenom = prenom;
+  if (sexe !== undefined) employe.sexe = sexe;
   if (tel !== undefined) employe.tel = tel;
   if (email !== undefined) employe.email = email;
   if (addresse !== undefined) employe.addresse = addresse;

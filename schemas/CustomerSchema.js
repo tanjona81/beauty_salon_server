@@ -12,6 +12,9 @@ const customerSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    sexe: {
+        type: String
+    },
     tel: {
         type: String,
         required: true
