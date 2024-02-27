@@ -156,31 +156,6 @@ const all_service_plus_prefere = async (id_customer) => {
         //     }
         // },
     ]);
-    // return await Preference.aggregate([
-    //     {
-    //         $match: {
-    //             id_customer: _id_customer,
-    //             designation: "service"
-    //         }
-    //     },
-    //     {
-    //         $lookup: {
-    //             from: 'services',
-    //             localField: 'id_prefere',
-    //             foreignField: '_id',
-    //             as: 'services'
-    //         }
-    //     },
-    //     {
-    //         $unwind: { path: "$services" }
-    //     },
-    //     {
-    //         $project: {
-    //             _id: 0,
-    //             services: "$services"
-    //         }
-    //     }
-    // ]);
 }
 
 module.exports = {
