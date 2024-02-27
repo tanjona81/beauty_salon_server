@@ -121,9 +121,9 @@ const createRendezvous = () => {
   return async (req, res) => {
     try {
       // await mongoose.connect(uri)
-      const { id_customer, id_service, id_employe, date_heure } = req.body;
+      const { id_service, id_employe, date_heure } = req.body;
       await service
-        .create(id_customer, id_service, id_employe, date_heure)
+        .create(req.user_id, id_service, id_employe, date_heure)
         .then((result) => {
           const responseData = {
             status: true,
