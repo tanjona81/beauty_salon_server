@@ -128,8 +128,8 @@ const createPreference = () => {
     return (async (req,res)=>{
         try{
             // await mongoose.connect(uri)
-            const {id_customer, id_prefere, designation} = req.body;
-            await service.create(id_customer, id_prefere, designation)
+            const {id_prefere, designation} = req.body;
+            await service.create(req.user_id, id_prefere, designation)
             .then((result)=>{
                 const responseData = {
                     status: true,
