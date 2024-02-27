@@ -116,7 +116,21 @@ const all_service_plus_prefere = async (id_customer) => {
                   }
                 }
               }
-        }
+        },
+        {
+            $match: {
+                $or: [
+                    {
+                        $and: [
+                            {$expr:{ $eq:["$preferences.id_customer", _id_customer] } },
+                            {$expr:{ $eq:["$preferences.designation", "service"] } }
+                        ]
+                    },
+                    { $expr:{ $eq: [{ $ifNull: ["$preferences", null] }, null] } }
+                ]
+                
+            }
+        },
     ]);
     // return await Preference.aggregate([
     //     {
