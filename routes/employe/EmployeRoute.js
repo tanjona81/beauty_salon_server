@@ -4,6 +4,7 @@ const controlleur = require("../../controlleurs/employe/EmployeControlleur.js");
 const { authJwt } = require("../../middlewares");
 
 router.get("/list", [authJwt.verifyToken], controlleur.getEmploye());
+router.get("/list/activated", [authJwt.verifyToken], controlleur.getAllActif());
 router.post(
   "/create",
   [authJwt.verifyToken, authJwt.isManager],

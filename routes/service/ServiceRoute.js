@@ -4,6 +4,7 @@ const controlleur = require("../../controlleurs/service/ServiceControlleur.js");
 const { authJwt } = require("../../middlewares");
 
 router.get("/list", controlleur.getService());
+router.get("/list/activated", controlleur.getServiceActif());
 router.post(
   "/create",
   [authJwt.verifyToken, authJwt.isManager],

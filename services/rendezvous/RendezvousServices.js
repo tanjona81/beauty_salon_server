@@ -14,8 +14,10 @@ const getById = async (id) => {
 }
 
 const create = async (id_customer, id_service, id_employe, date_heure) =>  {
-    const employe = await Employe.findOne({_id : id_employe});
-    const service = await Service.findOne({_id : id_service})
+    const employe = await Employe.findOne({_id : id_employe, is_activated: 1});
+    const service = await Service.findOne({_id : id_service, is_activated: 1});
+
+    if(!employe || !service) return {message:`Employe or service not activated`}
 
     // Convert the date_heure parameter into Date
     const date = new Date(date_heure)
@@ -117,6 +119,9 @@ const delete_rendezvous = async (id) => {
 }
 
 const create_rdv_no_employe = async (id_customer, id_service, date_heure) =>  {
+    const service = await Service.findOne({_id : id_service, is_activated: 1});
+    if(!service) return {message:`Employe or service not activated`}
+
     let rendezvous = new Rendezvous();
     rendezvous.id_customer = id_customer
     rendezvous.id_service = id_service
