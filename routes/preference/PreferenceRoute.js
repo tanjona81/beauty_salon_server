@@ -12,6 +12,8 @@ router.get('/employes', [authJwt.verifyToken, authJwt.isCustomer], controlleur.g
 router.get('/services', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceService())
 router.get('/all-services', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getAllServicePlusPreference())
 router.get('/all-employes', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getAllEmployePlusPreference())
+router.get('/all-employes/activated', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getAllEmployeActifPlusPreference())
+router.get('/all-services/activated', [authJwt.verifyToken, authJwt.isCustomer], controlleur.getAllServiceAcitfPlusPreference())
 
 router.route('/:id')
     .get([authJwt.verifyToken, authJwt.isCustomer], controlleur.getPreferenceById())

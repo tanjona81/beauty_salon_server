@@ -251,6 +251,7 @@ const updateEmploye = () => {
         mdp,
         heure_debut,
         heure_fin,
+        is_activated
       } = req.body;
       await service
         .update(
@@ -264,7 +265,8 @@ const updateEmploye = () => {
           addresse,
           mdp,
           heure_debut,
-          heure_fin
+          heure_fin,
+          is_activated
         )
         .then((result) => {
           return res.status(200).json(result);
@@ -595,6 +597,57 @@ const acceptRdvNoEmploye = () => {
   };
 };
 
+const getAllActif = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getAllActif()
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: `List all activated employe`,
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
 module.exports = {
   getEmploye,
   getEmployeById,
@@ -606,5 +659,6 @@ module.exports = {
   getDoneRendezvousEmploye,
   validate_rendezvous,
   getCommission,
-  acceptRdvNoEmploye
+  acceptRdvNoEmploye,
+  getAllActif
 };

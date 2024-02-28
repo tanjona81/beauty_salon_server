@@ -11,7 +11,7 @@ const config = require("../../config/auth.config.js");
 const stringToTime = require("../../Utils/Time.js");
 
 const login = async (email, mdp) => {
-  const user = await Employe.findOne({ email: email });
+  const user = await Employe.findOne({ email: email , is_activated: 1});
   const test = await bcrypt.compare(mdp, user.mdp);
   if (test) {
     const usertoken = {
@@ -76,7 +76,8 @@ const update = async (
   addresse,
   mdp,
   heure_debut,
-  heure_fin
+  heure_fin,
+  is_activated
 ) => {
   let employe = await Employe.findById(id);
   if (image !== undefined) employe.image = image;
@@ -97,6 +98,7 @@ const update = async (
   if (addresse !== undefined) employe.addresse = addresse;
   if (heure_debut !== undefined) employe.heure_debut = heure_debut;
   if (heure_fin !== undefined) employe.heure_fin = heure_fin;
+  if (is_activated !== undefined) employe.is_activated = is_activated;
   return await employe.save();
 };
 
@@ -211,8 +213,10 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
   const rdv = await Rendezvous.findById(id_rendezvous);
   const date_plus_1mn = new Date(rdv.date_heure.getTime() - 1 * 60000);
   const customer = await Customer.findById(rdv.id_customer);
-  const employe = await Employe.findOne({_id : id_employe});
-  const service = await Service.findOne({_id : rdv.id_service})
+  const employe = await Employe.findOne({_id : id_employe, is_activated: 1});
+  const service = await Service.findOne({_id : rdv.id_service, is_activated: 1})
+
+  if(!employe || !service) return {message:`Employe or service not activated`}
 
   // Convert the date_heure parameter into Date
   const date = new Date(rdv.date_heure)
@@ -311,6 +315,10 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
   return rdv;
 };
 
+const getAllActif = async () => {
+  return await Employe.find({is_activated: 1});
+};
+
 module.exports = {
   getAll,
   getById,
@@ -322,5 +330,6 @@ module.exports = {
   getDoneRendezvous,
   validate_rendezvous,
   commission_per_day,
-  accept_rendezvous_no_employe
+  accept_rendezvous_no_employe,
+  getAllActif
 };
