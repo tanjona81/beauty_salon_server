@@ -319,6 +319,14 @@ const getAllActif = async () => {
   return await Employe.find({is_activated: 1});
 };
 
+const getRendezvousAssigne = async (id_employe) => {
+  return await Rendezvous.where("id_employe")
+    .equals(id_employe)
+    .populate("id_service")
+    .populate("id_customer")
+    .sort({date_heure: -1});
+};
+
 module.exports = {
   getAll,
   getById,
@@ -331,5 +339,6 @@ module.exports = {
   validate_rendezvous,
   commission_per_day,
   accept_rendezvous_no_employe,
-  getAllActif
+  getAllActif,
+  getRendezvousAssigne
 };

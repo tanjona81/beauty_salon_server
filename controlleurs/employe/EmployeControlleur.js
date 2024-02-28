@@ -136,7 +136,16 @@ const getEmployeById = () => {
             };
             return res.status(HttpStatus.OK).json(responseData);
           }
-          return res.status(200).json(result);
+          const responseData = {
+            status: true,
+            message: "Employe found",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -201,7 +210,16 @@ const createEmploye = () => {
           heure_fin
         )
         .then((result) => {
-          return res.status(201).json(result);
+          const responseData = {
+            status: true,
+            message: "Employe created successfuly",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -269,7 +287,16 @@ const updateEmploye = () => {
           is_activated
         )
         .then((result) => {
-          return res.status(200).json(result);
+          const responseData = {
+            status: true,
+            message: "Employe updated successfuly",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -311,7 +338,16 @@ const deleteEmploye = () => {
       await service
         .delete_employe(req.params.id)
         .then((result) => {
-          return res.status(204).json("Employe deleted");
+          const responseData = {
+            status: true,
+            message: "Employe deleted successfuly",
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(204).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -364,7 +400,16 @@ const getRendezvousEmploye = () => {
             };
             return res.status(HttpStatus.OK).json(responseData);
           }
-          return res.status(200).json(result);
+          const responseData = {
+            status: true,
+            message: "List rendezvous for this employe",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -457,9 +502,28 @@ const validate_rendezvous = () => {
       await service
         .validate_rendezvous(req.params.id)
         .then((result) => {
-          if (result.length <= 0)
-            return res.status(204).send("No match for the request");
-          return res.status(200).json(result);
+          if (result.length <= 0){
+            const responseData = {
+              status: false,
+              message: "No match for the request for this id",
+              details: null,
+              http_response: {
+                message: HttpStatus.getStatusText(HttpStatus.NO_CONTENT),
+                code: HttpStatus.OK,
+              },
+            };
+            return res.status(200).json(responseData);
+          }
+          const responseData = {
+            status: true,
+            message: "Rdv Validated",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -648,6 +712,57 @@ const getAllActif = () => {
   };
 };
 
+const getRdvAssigne = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getRendezvousAssigne(req.user_id)
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: `List rdv assigne`,
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
 module.exports = {
   getEmploye,
   getEmployeById,
@@ -660,5 +775,6 @@ module.exports = {
   validate_rendezvous,
   getCommission,
   acceptRdvNoEmploye,
-  getAllActif
+  getAllActif,
+  getRdvAssigne
 };

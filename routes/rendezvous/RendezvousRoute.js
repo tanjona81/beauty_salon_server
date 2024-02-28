@@ -8,15 +8,28 @@ router.get(
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.getRendezvous()
 );
+
 router.get(
-  "/list/rendezvous-no-employe",
+  "/populated",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.getAllrdvJoin()
+);
+
+router.get(
+  "/no-employe",
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.getRendezvousNoEmploye()
 );
 
+router.get(
+  "/no-employe/up-date",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.getRendezvousNoEmployeUpToDate()
+);
+
 router.post("/create", [authJwt.verifyToken], controlleur.createRendezvous());
 
-router.post("/create/rendezvous-no-employe", [authJwt.verifyToken, authJwt.isCustomer], 
+router.post("/create/rendezvous-no-employe", [authJwt.verifyToken], 
   controlleur.createRendezvousNoEmploye());
 
 router
