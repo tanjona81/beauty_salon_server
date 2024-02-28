@@ -60,7 +60,7 @@ const verifyBlacklist_token = () => {
       await service
         .getByToken(req.param.token)
         .then((result) => {
-          rep = true
+          let rep = true
           if(!result) rep = false;
           const responseData = {
             status: true,

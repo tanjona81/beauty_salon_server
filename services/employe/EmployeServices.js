@@ -8,6 +8,7 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const sendmail = require("../../Utils/Gmail.js");
 const config = require("../../config/auth.config.js");
+const stringToTime = require("../../Utils/Time.js");
 
 const login = async (email, mdp) => {
   const user = await Employe.findOne({ email: email });
@@ -219,8 +220,8 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
   // date_heure + service.duree
   let date_heure_plus_duree = new Date(date.getTime() + service.duree * 60000)
 
-  const time_debut = utils.stringToTime(employe.heure_debut)
-  const time_fin = utils.stringToTime(employe.heure_fin)
+  const time_debut = stringToTime(employe.heure_debut)
+  const time_fin = stringToTime(employe.heure_fin)
 
   // Consvert the date_heure parameter into string Y-M-D
   const formatted_date_string = date.toISOString().slice(0, 10)

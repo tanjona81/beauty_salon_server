@@ -88,7 +88,7 @@ const getOfferById = () => {
                 const responseData = {
                     status: false,
                     message: err.message,
-                    details: result,
+                    details: null,
                     http_response: {
                       message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
                       code: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -101,7 +101,7 @@ const getOfferById = () => {
             const responseData = {
                 status: false,
                 message: e.message,
-                details: result,
+                details: null,
                 http_response: {
                   message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
                   code: HttpStatus.INTERNAL_SERVER_ERROR,
