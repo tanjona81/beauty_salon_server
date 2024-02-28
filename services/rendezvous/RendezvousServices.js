@@ -151,11 +151,13 @@ const get_rdv_no_employe = async () => {
 const getAllRdvJoin = async () => {
     return await Rendezvous.find()
     .populate({
-        path: "id_service",
-        options: { preserveNullAndEmptyArrays: true }
+        path: "id_customer"
     })
     .populate({
-        path: "id_customer",
+        path: "id_service"
+    })
+    .populate({
+        path: "id_employe",
         options: { preserveNullAndEmptyArrays: true }
     })
     .sort({date_heure: -1});
