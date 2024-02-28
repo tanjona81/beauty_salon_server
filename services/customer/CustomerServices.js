@@ -123,7 +123,7 @@ const getHistoryRendezvous = async (id_customer) => {
     },
     {
       $lookup: {
-        from: "payment",
+        from: "payments",
         localField: "_id",
         foreignField: "id_rendezvous",
         as: "payment",
