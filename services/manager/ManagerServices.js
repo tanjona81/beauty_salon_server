@@ -181,18 +181,18 @@ const nbrReservation_mois = async () => {
   ]);
 
   const month = [
-    { value: 0, name: "Janvier", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Fevrier", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Mars", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Avril", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Mais", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Juin", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Juillet", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Aout", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Septembre", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Octobre", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Novembre", year : rdv_mois[0]._id.year },
-    { value: 0, name: "Decembre", year : rdv_mois[0]._id.year },
+    { value: 0, name: "Janvier", year : new Date().getFullYear() },
+    { value: 0, name: "Fevrier", year : new Date().getFullYear() },
+    { value: 0, name: "Mars", year : new Date().getFullYear() },
+    { value: 0, name: "Avril", year : new Date().getFullYear() },
+    { value: 0, name: "Mais", year : new Date().getFullYear() },
+    { value: 0, name: "Juin", year : new Date().getFullYear() },
+    { value: 0, name: "Juillet", year : new Date().getFullYear() },
+    { value: 0, name: "Aout", year : new Date().getFullYear() },
+    { value: 0, name: "Septembre", year : new Date().getFullYear() },
+    { value: 0, name: "Octobre", year : new Date().getFullYear() },
+    { value: 0, name: "Novembre", year : new Date().getFullYear() },
+    { value: 0, name: "Decembre", year : new Date().getFullYear() },
   ]
 
     for(let i=0;i<rdv_mois.length;i++){
@@ -258,18 +258,18 @@ const chiffreAffaire_mois = async () => {
   ]);
 
   const month = [
-    { value: 0, name: "Janvier", year : CA_mois[0]._id.year },
-    { value: 0, name: "Fevrier", year : CA_mois[0]._id.year },
-    { value: 0, name: "Mars", year : CA_mois[0]._id.year },
-    { value: 0, name: "Avril", year : CA_mois[0]._id.year },
-    { value: 0, name: "Mais", year : CA_mois[0]._id.year },
-    { value: 0, name: "Juin", year : CA_mois[0]._id.year },
-    { value: 0, name: "Juillet", year : CA_mois[0]._id.year },
-    { value: 0, name: "Aout", year : CA_mois[0]._id.year },
-    { value: 0, name: "Septembre", year : CA_mois[0]._id.year },
-    { value: 0, name: "Octobre", year : CA_mois[0]._id.year },
-    { value: 0, name: "Novembre", year : CA_mois[0]._id.year },
-    { value: 0, name: "Decembre", year : CA_mois[0]._id.year },
+    { value: 0, name: "Janvier", year : new Date().getFullYear() },
+    { value: 0, name: "Fevrier", year : new Date().getFullYear() },
+    { value: 0, name: "Mars", year : new Date().getFullYear() },
+    { value: 0, name: "Avril", year : new Date().getFullYear() },
+    { value: 0, name: "Mais", year : new Date().getFullYear() },
+    { value: 0, name: "Juin", year : new Date().getFullYear() },
+    { value: 0, name: "Juillet", year : new Date().getFullYear() },
+    { value: 0, name: "Aout", year : new Date().getFullYear() },
+    { value: 0, name: "Septembre", year : new Date().getFullYear() },
+    { value: 0, name: "Octobre", year : new Date().getFullYear() },
+    { value: 0, name: "Novembre", year : new Date().getFullYear() },
+    { value: 0, name: "Decembre", year : new Date().getFullYear() },
   ]
 
     for(let i=0;i<CA_mois.length;i++){
@@ -348,7 +348,7 @@ const beneficeparmois = async (mois, loyer, piece, autres) => {
       },
     },
   ]);
-  
+
   let paid_chiffre = 0
   if(paid.length > 0) paid_chiffre = Number(paid[0].chiffre.toFixed(2))
   
