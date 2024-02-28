@@ -173,9 +173,9 @@ const updateService = () => {
   return async (req, res) => {
     try {
       // await mongoose.connect(uri)
-      const { nom, prix, duree, commission } = req.body;
+      const { nom, prix, duree, commission, is_activated } = req.body;
       await service
-        .update(req.params.id, nom, prix, duree, commission)
+        .update(req.params.id, nom, prix, duree, commission, is_activated)
         .then((result) => {
           const responseData = {
             status: true,
