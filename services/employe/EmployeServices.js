@@ -82,7 +82,7 @@ const update = async (
   let employe = await Employe.findById(id);
   if (image !== undefined) employe.image = image;
   if (nom !== undefined) employe.nom = nom;
-  if (mdp !== undefined) {
+  if (mdp !== undefined && mdp !== null) {
     // Generate a salt
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);

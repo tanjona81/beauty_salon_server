@@ -132,7 +132,7 @@ const getCustomerById = () => {
                 code: HttpStatus.OK,
               },
             };
-            return res.status(HttpStatus.NO_CONTENT).json(responseData);
+            return res.status(HttpStatus.OK).json(responseData);
           }
           const responseData = {
             status: true,

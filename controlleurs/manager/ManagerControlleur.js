@@ -615,7 +615,7 @@ const getCAMinusCost = () => {
                 },
               };
                 // if(result.length<=0) return res.status(204).send('No match for the request')
-                return res.status(200).json(result)
+                return res.status(200).json(responseData)
                 
             })
             .catch((err) => {
