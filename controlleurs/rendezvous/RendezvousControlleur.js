@@ -409,6 +409,108 @@ const getRendezvousNoEmploye = () => {
   };
 };
 
+const getAllrdvJoin = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getAllRdvJoin()
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: "List All rdv",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e.message,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
+const getRendezvousNoEmployeUpToDate = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .get_rdv_no_employe_upToDate()
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: "List rendezvous with no employe up to date",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e.message,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
 module.exports = {
   getRendezvous,
   getRendezvousById,
@@ -416,5 +518,7 @@ module.exports = {
   updateRendezvous,
   deleteRendezvous,
   createRendezvousNoEmploye,
-  getRendezvousNoEmploye
+  getRendezvousNoEmploye,
+  getAllrdvJoin,
+  getRendezvousNoEmployeUpToDate
 };

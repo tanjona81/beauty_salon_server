@@ -148,6 +148,43 @@ const get_rdv_no_employe = async () => {
     ])
 }
 
+const getAllRdvJoin = async () => {
+    return await Rendezvous.find()
+    .populate({
+        path: "id_service",
+        options: { preserveNullAndEmptyArrays: true }
+    })
+    .populate({
+        path: "id_customer",
+        options: { preserveNullAndEmptyArrays: true }
+    })
+    .sort({date_heure: -1});
+}
+
+const get_rdv_no_employe_upToDate = async () => {
+    return await Rendezvous.aggregate([
+        {
+            $lookup: {
+                from: 'services',
+                localField: 'id_service',
+                foreignField: '_id',
+                as: 'services'
+            }
+        },
+        {
+            $unwind: { path: "$services" }
+        },
+        {
+            $match:{
+                id_employe: { $exists: false },
+                $expr:{
+                    $gt: [{ $add: ["$date_heure", { $multiply: ["$services.duree", 60000] }] },new Date()]
+                }
+            }
+        },
+    ])
+}
+
 module.exports = {
     getAll,
     getById,
@@ -155,5 +192,7 @@ module.exports = {
     update,
     delete_rendezvous,
     create_rdv_no_employe,
-    get_rdv_no_employe
+    get_rdv_no_employe,
+    getAllRdvJoin,
+    get_rdv_no_employe_upToDate
 }
