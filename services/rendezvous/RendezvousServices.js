@@ -21,9 +21,12 @@ const create = async (id_customer, id_service, id_employe, date_heure) =>  {
 
     // Convert the date_heure parameter into Date
     const date = new Date(date_heure)
+    const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const time_date = utils.stringToTime(date.toLocaleTimeString(undefined, options)); 
 
     // date_heure + service.duree
     let date_heure_plus_duree = new Date(date.getTime() + service.duree * 60000)
+    const time_date_plus_duree = utils.stringToTime(date_heure_plus_duree.toLocaleTimeString(undefined, options)); 
 
     const time_debut = utils.stringToTime(employe.heure_debut)
     const time_fin = utils.stringToTime(employe.heure_fin)
@@ -70,8 +73,8 @@ const create = async (id_customer, id_service, id_employe, date_heure) =>  {
     ])
 
     // Check if the employe work on the parameter date
-    if(date.getTime() < time_debut.getTime() || date.getTime() > time_fin.getTime()
-        || date_heure_plus_duree.getTime() > time_fin.getTime()) 
+    if(time_date.getTime() < time_debut.getTime() || time_date.getTime() > time_fin.getTime()
+        || time_date_plus_duree.getTime() > time_fin.getTime()) 
         return {message:`${employe.nom} doesn't work on this date`}
     
     // console.log(rendezvous_valid)
