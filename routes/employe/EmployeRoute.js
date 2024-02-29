@@ -2,11 +2,13 @@ const express = require("express");
 const router = express.Router();
 const controlleur = require("../../controlleurs/employe/EmployeControlleur.js");
 const { authJwt } = require("../../middlewares");
+const { isManagerOrEmploye } = require("../../middlewares/authJwt.js");
 
 router.get("/list", [authJwt.verifyToken], controlleur.getEmploye());
 router.get("/list/activated", [authJwt.verifyToken], controlleur.getAllActif());
-router.get("/list/rendezvous/assigne", [authJwt.verifyToken], controlleur.getRdvAssigne());
-router.get("/rendezvous/assigne/up-to-date", [authJwt.verifyToken], controlleur.getRdvAssigneUpToDate());
+router.get("/list/rendezvous/assigne", [authJwt.verifyToken, isManagerOrEmploye], controlleur.getRdvAssigne());
+router.get("/rendezvous/assigne/up-to-date", [authJwt.verifyToken, isManagerOrEmploye], controlleur.getRdvAssigneUpToDate());
+router.get("/rendezvous/up-to-date", [authJwt.verifyToken, isManagerOrEmploye], controlleur.getRdvUpToDate());
 router.post(
   "/create",
   [authJwt.verifyToken, authJwt.isManager],
