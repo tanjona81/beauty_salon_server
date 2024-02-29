@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const sendmail = require("../../Utils/Gmail.js");
 const config = require("../../config/auth.config.js");
-const stringToTime = require("../../Utils/Time.js");
+const utils = require('../../Utils/Time.js')
 
 const login = async (email, mdp) => {
   const user = await Employe.findOne({ email: email , is_activated: 1});
@@ -221,14 +221,14 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
   // Convert the date_heure parameter into Date
   const date = new Date(rdv.date_heure)
   const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-  const time_date = stringToTime(date.toLocaleTimeString(undefined, options)); 
+  const time_date = utils.stringToTime(date.toLocaleTimeString(undefined, options)); 
 
   // date_heure + service.duree
   let date_heure_plus_duree = new Date(date.getTime() + service.duree * 60000)
-  const time_date_plus_duree = stringToTime(date_heure_plus_duree.toLocaleTimeString(undefined, options)); 
+  const time_date_plus_duree = utils.stringToTime(date_heure_plus_duree.toLocaleTimeString(undefined, options)); 
 
-  const time_debut = stringToTime(employe.heure_debut)
-  const time_fin = stringToTime(employe.heure_fin)
+  const time_debut = utils.stringToTime(employe.heure_debut)
+  const time_fin = utils.stringToTime(employe.heure_fin)
 
   // Consvert the date_heure parameter into string Y-M-D
   const formatted_date_string = date.toISOString().slice(0, 10)
