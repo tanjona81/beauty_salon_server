@@ -330,8 +330,10 @@ const getRendezvousAssigne = async (id_employe) => {
 const getRendezvousAssigneUpToDate = async (id_employe) => {
   return await Rendezvous.where("id_employe")
     .equals(id_employe)
-    .where(date_heure)
+    .where("date_heure")
     .gte(new Date())
+    .where("is_valider")
+    .equals(0)
     .populate("id_service")
     .populate("id_customer")
     .sort({date_heure: -1});

@@ -772,7 +772,7 @@ const getRdvAssigneUpToDate = () => {
         .then((result) => {
           const responseData = {
             status: true,
-            message: `List rdv assigne`,
+            message: `List rdv assigne up to date`,
             details: result,
             http_response: {
               message: HttpStatus.getStatusText(HttpStatus.OK),
@@ -784,7 +784,7 @@ const getRdvAssigneUpToDate = () => {
         .catch((err) => {
           const responseData = {
             status: false,
-            message: err,
+            message: err.message,
             details: null,
             http_response: {
               message: HttpStatus.getStatusText(
@@ -800,7 +800,7 @@ const getRdvAssigneUpToDate = () => {
     } catch (e) {
       const responseData = {
         status: false,
-        message: e,
+        message: e.message,
         details: null,
         http_response: {
           message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
