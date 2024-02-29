@@ -152,7 +152,7 @@ const validate_rendezvous = async (id_rendezvous) => {
   );
 
   rdv.is_valid = 1;
-  return rdv;
+  return await rdv.save();
 };
 
 const commission_per_day = async (id_employe) => {
