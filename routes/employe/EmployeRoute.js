@@ -27,7 +27,7 @@ router.get(
   controlleur.getDoneRendezvousEmploye()
 );
 router.put(
-  "/rendezvousvalidate/",
+  "/rendezvousvalidate/:id",
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.validate_rendezvous()
 );
