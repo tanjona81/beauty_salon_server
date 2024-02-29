@@ -631,7 +631,7 @@ const acceptRdvNoEmploye = () => {
         .catch((err) => {
           const responseData = {
             status: false,
-            message: err,
+            message: err.message,
             details: null,
             http_response: {
               message: HttpStatus.getStatusText(
@@ -647,7 +647,7 @@ const acceptRdvNoEmploye = () => {
     } catch (e) {
       const responseData = {
         status: false,
-        message: e,
+        message: e.message,
         details: null,
         http_response: {
           message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
