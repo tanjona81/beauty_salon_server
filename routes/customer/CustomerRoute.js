@@ -23,6 +23,7 @@ router.post("/create", controlleur.createCustomer());
 router.post("/payment", [authJwt.verifyToken, authJwt.isCustomer], controlleur.payment());
 router.get("/history/rendezvous", [authJwt.verifyToken, authJwt.isCustomer], controlleur.getHistoryRendezvous());
 router.get("/not-paid/rendezvous", [authJwt.verifyToken, authJwt.isCustomer], controlleur.getNotPaid());
+router.get("/offers", [authJwt.verifyToken], controlleur.getOffers());
 
 router
   .route("/customer/:id")

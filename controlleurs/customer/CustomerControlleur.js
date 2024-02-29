@@ -604,6 +604,57 @@ const searchByName = () => {
   };
 };
 
+const getOffers = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getOffers(req.user_id)
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: `Customer with name ${req.query.name}`,
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((error) => {
+          const responseData = {
+            status: false,
+            message: error.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e.message,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
 module.exports = {
   getCustomer,
   getCustomerById,
@@ -615,5 +666,6 @@ module.exports = {
   getHistoryRendezvous,
   getNotPaid,
   searchByName,
-  getAllLimit
+  getAllLimit,
+  getOffers
 };
