@@ -8,6 +8,16 @@ router.get(
   [authJwt.verifyToken, authJwt.isManagerOrEmploye],
   controlleur.getCustomer()
 );
+router.get(
+  "/limit",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.getAllLimit()
+);
+router.get(
+  "/search/name",
+  [authJwt.verifyToken, authJwt.isManagerOrEmploye],
+  controlleur.searchByName()
+);
 router.post("/login", controlleur.loginCustomer());
 router.post("/create", controlleur.createCustomer());
 router.post("/payment", [authJwt.verifyToken, authJwt.isCustomer], controlleur.payment());

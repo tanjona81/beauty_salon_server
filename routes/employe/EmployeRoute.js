@@ -6,6 +6,7 @@ const { authJwt } = require("../../middlewares");
 router.get("/list", [authJwt.verifyToken], controlleur.getEmploye());
 router.get("/list/activated", [authJwt.verifyToken], controlleur.getAllActif());
 router.get("/list/rendezvous/assigne", [authJwt.verifyToken], controlleur.getRdvAssigne());
+router.get("/rendezvous/assigne/up-to-date", [authJwt.verifyToken], controlleur.getRdvAssigneUpToDate());
 router.post(
   "/create",
   [authJwt.verifyToken, authJwt.isManager],

@@ -6,6 +6,8 @@ const { authJwt } = require("../../middlewares");
 router.get('/', [authJwt.verifyToken, authJwt.isManager], controlleur.getOffer())
 router.post('/', [authJwt.verifyToken, authJwt.isManager], controlleur.createOffer())
 
+router.get('/up-to-date', [authJwt.verifyToken, authJwt.isManager], controlleur.getOfferUpToDate())
+
 router.route('/:id')
     .get([authJwt.verifyToken, authJwt.isManager], controlleur.getOfferById())
     .put([authJwt.verifyToken, authJwt.isManager], controlleur.updateOffer())
