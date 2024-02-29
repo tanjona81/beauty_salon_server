@@ -24,15 +24,21 @@ const create = async (id_customer, id_service, reduction, date_heure_fin) =>  {
                 id_customer: _id_customer,
                 id_service: _id_service,
                 $expr:{
-                    $gte: [date_heure_fin, new Date()]
+                    $gte: ["$date_heure_fin", new Date()]
                 }
             }
         }
     ])
 
+    console.log(offer_exist);
+
     //Check if there is already an Offer with this customer for that specific service
-    if(offer_exist.length > 0 && (new Date(date_heure_fin).getTime()) <= offer_exist[0].date_heure_fin.getTime()) 
-    throw new Error("There is already an Offer with this customer for that specific service")
+    // if(offer_exist.length > 0 && (new Date(date_heure_fin).getTime()) <= new Date(offer_exist[0].date_heure_fin).getTime())
+    if(offer_exist.length > 0) 
+        return ({
+            message:"There is already an Offer with this customer for that specific service",
+            code: 'offer_exist'
+            })
 
     const customer = await Customer.findById(id_customer)
     const service = await Service.findById(id_service)
