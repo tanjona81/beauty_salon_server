@@ -58,7 +58,7 @@ const sendOffer = (email, name, service_name, reduction, date_heure_fin) => {
     subject: 'Special Offer for you', // Email subject
     html: `<h2>Hello ${name},</h2> 
           </br>
-          <p>Congratulation, you are one of the lucky customer to gain a reduction of ${reduction} on the service
+          <p>Congratulation, you are one of the lucky customer to gain a reduction of ${reduction}% on the service
           ${service_name}. </p>
           <p>This will be available until ${date_heure_fin}</p>
           </br>
