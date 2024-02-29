@@ -236,6 +236,10 @@ const searchByName = async (name, email) => {
   return await Customer.find({nom: { $regex: new RegExp(name, 'i') }, email: { $regex: new RegExp(email, 'i') } }).limit(5)
 };
 
+const getOffers = async (id_customer) => {
+  return await Offer.where("id_customer").equals(id_customer).populate("id_service").sort({date_heure_fin: -1})
+};
+
 module.exports = {
   getAll,
   getById,
@@ -247,5 +251,6 @@ module.exports = {
   getHistoryRendezvous,
   getNotPaid,
   getAllLimit,
-  searchByName
+  searchByName,
+  getOffers
 };
