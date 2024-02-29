@@ -466,7 +466,7 @@ const getNotPaid = () => {
               code: HttpStatus.OK,
             },
           };
-          return res.status(200).json(result);
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
