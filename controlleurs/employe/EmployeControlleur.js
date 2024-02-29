@@ -567,7 +567,7 @@ const getCommission = () => {
         .then((result) => {
           const responseData = {
             status: true,
-            message: `Commission with id ${req.params.id}`,
+            message: `Commission with id ${req.user_id}`,
             details: result,
             http_response: {
               message: HttpStatus.getStatusText(HttpStatus.OK),
