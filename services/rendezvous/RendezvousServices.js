@@ -180,6 +180,17 @@ const get_rdv_no_employe_upToDate = async () => {
             $unwind: { path: "$services" }
         },
         {
+            $lookup: {
+                from: 'customers',
+                localField: 'id_customer',
+                foreignField: '_id',
+                as: 'customers'
+            }
+        },
+        {
+            $unwind: { path: "$customers" }
+        },
+        {
             $match:{
                 id_employe: { $exists: false },
                 $expr:{
