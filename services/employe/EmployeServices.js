@@ -299,7 +299,7 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
     rdv.date_heure.toTimeString().slice(0, 8)
   );
 
-  // send a reminder email to the customer 1mn after
+  // send a reminder email to the customer 1mn before the rdv
   cron.schedule(
     `${date_plus_1mn.getMinutes()} ${date_plus_1mn.getHours()} ${date_plus_1mn.getDate()} 
     ${date_plus_1mn.getMonth() + 1} *`,
@@ -315,7 +315,7 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
 
   rdv.id_employe = id_employe
   rdv.is_valid = 1;
-  return rdv;
+  return await rdv.save();
 };
 
 const getAllActif = async () => {
