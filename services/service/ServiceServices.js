@@ -35,11 +35,22 @@ const getAllActif = async () => {
     return await Service.find({is_activated: 1});
 }
 
+const getAllLimit = async () => {
+    return await Service.find()
+    .limit(5);
+  };
+  
+  const searchByName = async (name) => {
+    return await Service.find({nom: { $regex: new RegExp(name, 'i') }, is_activated: 1 }).limit(5)
+  };
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
     delete_service,
-    getAllActif
+    getAllActif,
+    getAllLimit,
+    searchByName
 }

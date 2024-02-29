@@ -13,7 +13,11 @@ const offerSchema = new mongoose.Schema({
     },
     reduction: {
         type: Number,
-        required: true
+        required: true,
+        validate:{
+            validator: redu => redu > 0,
+            message: props => `${props.value} should not be lower or equals to 0`
+        }
     },
     date_heure_fin: {
         type: Date,

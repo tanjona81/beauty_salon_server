@@ -227,6 +227,15 @@ const getNotPaid = async (id_customer) => {
   ]);
 };
 
+const getAllLimit = async () => {
+  return await Customer.find()
+  .limit(5);
+};
+
+const searchByName = async (name, email) => {
+  return await Customer.find({nom: { $regex: new RegExp(name, 'i') }, email: { $regex: new RegExp(email, 'i') } }).limit(5)
+};
+
 module.exports = {
   getAll,
   getById,
@@ -236,5 +245,7 @@ module.exports = {
   login,
   payment,
   getHistoryRendezvous,
-  getNotPaid
+  getNotPaid,
+  getAllLimit,
+  searchByName
 };
