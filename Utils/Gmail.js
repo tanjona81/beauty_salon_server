@@ -55,7 +55,7 @@ const sendOffer = (email, name, service_name, reduction, date_heure_fin) => {
   const mailOptions = {
     from: '"Beauty Salon support" mailteste81t@gmail.com', // Sender email address
     to: email, // Recipient email address
-    subject: 'Reminder of your meeting', // Email subject
+    subject: 'Special Offer for you', // Email subject
     html: `<h2>Hello ${name},</h2> 
           </br>
           <p>Congratulation, you are one of the lucky customer to gain a reduction of ${reduction} on the service
