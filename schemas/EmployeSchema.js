@@ -41,7 +41,18 @@ const employeSchema = new mongoose.Schema({
     },
     heure_fin: {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: function(value) {
+                // Convert the time strings to numbers for comparison
+                const heureDebut = parseInt(this.heure_debut.replace(':', ''));
+                const heureFin = parseInt(value.replace(':', ''));
+
+                // Check if heure_fin is greater than heure_debut
+                return heureFin > heureDebut;
+            },
+            message: 'heure_fin must be greater than heure_debut'
+        }
     },
     is_activated:{
         type: Number,

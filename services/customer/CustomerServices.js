@@ -123,7 +123,7 @@ const getHistoryRendezvous = async (id_customer) => {
     },
     {
       $lookup: {
-        from: "payment",
+        from: "payments",
         localField: "_id",
         foreignField: "id_rendezvous",
         as: "payment",
@@ -185,7 +185,7 @@ const getNotPaid = async (id_customer) => {
     },
     {
       $lookup: {
-        from: "payment",
+        from: "payments",
         localField: "_id",
         foreignField: "id_rendezvous",
         as: "payment",
@@ -218,13 +218,28 @@ const getNotPaid = async (id_customer) => {
     },
     {
       $match: {
-        payement: { $eq: null }
+        $expr: {
+          $eq: [{ $ifNull: ["$payment", null] }, null]
+        }
       }
     },
     {
       $sort: {date_heure: -1}
     },
   ]);
+};
+
+const getAllLimit = async () => {
+  return await Customer.find()
+  .limit(5);
+};
+
+const searchByName = async (name, email) => {
+  return await Customer.find({nom: { $regex: new RegExp(name, 'i') }, email: { $regex: new RegExp(email, 'i') } }).limit(5)
+};
+
+const getOffers = async (id_customer) => {
+  return await Offer.where("id_customer").equals(id_customer).populate("id_service").sort({date_heure_fin: -1})
 };
 
 module.exports = {
@@ -236,5 +251,8 @@ module.exports = {
   login,
   payment,
   getHistoryRendezvous,
-  getNotPaid
+  getNotPaid,
+  getAllLimit,
+  searchByName,
+  getOffers
 };

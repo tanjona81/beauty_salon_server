@@ -152,20 +152,6 @@ const all_service_plus_prefere = async (id_customer) => {
         created_at: -1,
       },
     },
-    // {
-    //     $match: {
-    //         $or: [
-    //             {
-    //                 $and: [
-    //                     {$expr:{ $eq:["$preferences.id_customer", _id_customer] } },
-    //                     {$expr:{ $eq:["$preferences.designation", "service"] } }
-    //                 ]
-    //             },
-    //             { $expr:{ $eq: [{ $ifNull: ["$preferences", null] }, null] } }
-    //         ]
-
-    //     }
-    // },
   ]);
 };
 
@@ -226,6 +212,127 @@ const all_employe_plus_prefere = async (id_customer) => {
   ]);
 };
 
+const all_employe_plus_prefere_actif = async (id_customer) => {
+  const _id_customer = new mongoose.Types.ObjectId(id_customer);
+  return await Employe.aggregate([
+    {
+      $match:{
+        is_activated: 1
+      }
+    },
+    {
+      $lookup: {
+        from: "preferences",
+        localField: "_id",
+        foreignField: "id_prefere",
+        as: "preferences",
+      },
+    },
+    {
+      $unwind: { path: "$preferences", preserveNullAndEmptyArrays: true },
+    },
+    {
+      $addFields: {
+        is_prefered: {
+          $cond: {
+            if: {
+              $or: [
+                { $eq: [{ $ifNull: ["$preferences", null] }, null] },
+                { $ne: ["$preferences.id_customer", _id_customer] },
+              ],
+            },
+            then: false,
+            else: true,
+          },
+        },
+      },
+    },
+    {
+      $sort: {
+        is_prefered: -1,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        nom: { $first: "$nom" },
+        image: { $first: "$image" },
+        prenom: { $first: "$prenom" },
+        sexe: { $first: "$sexe" },
+        tel: { $first: "$tel" },
+        email: { $first: "$addresse" },
+        mdp: { $first: "$mdp" },
+        created_at: { $first: "$created_at" },
+        is_prefered: { $first: "$is_prefered" },
+      },
+    },
+    {
+      $sort: {
+        created_at: -1,
+      },
+    },
+  ]);
+};
+
+const all_service_plus_prefere_actif = async (id_customer) => {
+  const _id_customer = new mongoose.Types.ObjectId(id_customer);
+  return await Service.aggregate([
+    {
+      $match:{
+        is_activated: 1
+      }
+    },
+    {
+      $lookup: {
+        from: "preferences",
+        localField: "_id",
+        foreignField: "id_prefere",
+        as: "preferences",
+      },
+    },
+    {
+      $unwind: { path: "$preferences", preserveNullAndEmptyArrays: true },
+    },
+    {
+      $addFields: {
+        is_prefered: {
+          $cond: {
+            if: {
+              $or: [
+                { $eq: [{ $ifNull: ["$preferences", null] }, null] },
+                { $ne: ["$preferences.id_customer", _id_customer] },
+              ],
+            },
+            then: false,
+            else: true,
+          },
+        },
+      },
+    },
+    {
+      $sort: {
+        is_prefered: -1,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        nom: { $first: "$nom" },
+        prix: { $first: "$prix" },
+        duree: { $first: "$duree" },
+        commission: { $first: "$commission" },
+        created_at: { $first: "$created_at" },
+        is_prefered: { $first: "$is_prefered" },
+      },
+    },
+    {
+      $sort: {
+        created_at: -1,
+      },
+    },
+  ]);
+};
+
 module.exports = {
   getAll,
   getById,
@@ -237,4 +344,6 @@ module.exports = {
   all_service_plus_prefere,
   find_and_delete_preference,
   all_employe_plus_prefere,
+  all_employe_plus_prefere_actif,
+  all_service_plus_prefere_actif
 };

@@ -8,9 +8,10 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const sendmail = require("../../Utils/Gmail.js");
 const config = require("../../config/auth.config.js");
+const utils = require('../../Utils/Time.js')
 
 const login = async (email, mdp) => {
-  const user = await Employe.findOne({ email: email });
+  const user = await Employe.findOne({ email: email , is_activated: 1});
   const test = await bcrypt.compare(mdp, user.mdp);
   if (test) {
     const usertoken = {
@@ -75,12 +76,13 @@ const update = async (
   addresse,
   mdp,
   heure_debut,
-  heure_fin
+  heure_fin,
+  is_activated
 ) => {
   let employe = await Employe.findById(id);
   if (image !== undefined) employe.image = image;
   if (nom !== undefined) employe.nom = nom;
-  if (mdp !== undefined) {
+  if (mdp !== undefined && mdp !== null) {
     // Generate a salt
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
@@ -96,6 +98,7 @@ const update = async (
   if (addresse !== undefined) employe.addresse = addresse;
   if (heure_debut !== undefined) employe.heure_debut = heure_debut;
   if (heure_fin !== undefined) employe.heure_fin = heure_fin;
+  if (is_activated !== undefined) employe.is_activated = is_activated;
   return await employe.save();
 };
 
@@ -149,7 +152,7 @@ const validate_rendezvous = async (id_rendezvous) => {
   );
 
   rdv.is_valid = 1;
-  return rdv;
+  return await rdv.save();
 };
 
 const commission_per_day = async (id_employe) => {
@@ -210,14 +213,19 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
   const rdv = await Rendezvous.findById(id_rendezvous);
   const date_plus_1mn = new Date(rdv.date_heure.getTime() - 1 * 60000);
   const customer = await Customer.findById(rdv.id_customer);
-  const employe = await Employe.findOne({_id : id_employe});
-  const service = await Service.findOne({_id : rdv.id_service})
+  const employe = await Employe.findOne({_id : id_employe, is_activated: 1});
+  const service = await Service.findOne({_id : rdv.id_service, is_activated: 1})
+
+  if(!employe || !service) return {message:`Employe or service not activated`}
 
   // Convert the date_heure parameter into Date
   const date = new Date(rdv.date_heure)
+  const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+  const time_date = utils.stringToTime(date.toLocaleTimeString(undefined, options)); 
 
   // date_heure + service.duree
   let date_heure_plus_duree = new Date(date.getTime() + service.duree * 60000)
+  const time_date_plus_duree = utils.stringToTime(date_heure_plus_duree.toLocaleTimeString(undefined, options)); 
 
   const time_debut = utils.stringToTime(employe.heure_debut)
   const time_fin = utils.stringToTime(employe.heure_fin)
@@ -264,8 +272,8 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
   ])
 
   // Check if the employe work on the parameter date
-  if(date.getTime() < time_debut.getTime() || date.getTime() > time_fin.getTime()
-      || date_heure_plus_duree.getTime() > time_fin.getTime()) 
+  if(time_date.getTime() < time_debut.getTime() || time_date.getTime() > time_fin.getTime()
+      || time_date_plus_duree.getTime() > time_fin.getTime()) 
       return {message:`${employe.nom} doesn't work on this date`}
   
   // console.log(rendezvous_valid)
@@ -291,7 +299,7 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
     rdv.date_heure.toTimeString().slice(0, 8)
   );
 
-  // send a reminder email to the customer 1mn after
+  // send a reminder email to the customer 1mn before the rdv
   cron.schedule(
     `${date_plus_1mn.getMinutes()} ${date_plus_1mn.getHours()} ${date_plus_1mn.getDate()} 
     ${date_plus_1mn.getMonth() + 1} *`,
@@ -307,7 +315,41 @@ const accept_rendezvous_no_employe = async (id_rendezvous, id_employe) => {
 
   rdv.id_employe = id_employe
   rdv.is_valid = 1;
-  return rdv;
+  return await rdv.save();
+};
+
+const getAllActif = async () => {
+  return await Employe.find({is_activated: 1});
+};
+
+const getRendezvousAssigne = async (id_employe) => {
+  return await Rendezvous.where("id_employe")
+    .equals(id_employe)
+    .populate("id_service")
+    .populate("id_customer")
+    .sort({date_heure: -1});
+};
+
+const getRendezvousAssigneUpToDate = async (id_employe) => {
+  return await Rendezvous.where("id_employe")
+    .equals(id_employe)
+    .where("date_heure")
+    .gte(new Date())
+    .where("is_valid")
+    .equals(0)
+    .populate("id_service")
+    .populate("id_customer")
+    .sort({date_heure: -1});
+};
+
+const getRendezvousUpToDate = async (id_employe) => {
+  return await Rendezvous.where("id_employe")
+    .equals(id_employe)
+    .where("date_heure")
+    .gte(new Date())
+    .populate("id_service")
+    .populate("id_customer")
+    .sort({date_heure: -1});
 };
 
 module.exports = {
@@ -321,5 +363,9 @@ module.exports = {
   getDoneRendezvous,
   validate_rendezvous,
   commission_per_day,
-  accept_rendezvous_no_employe
+  accept_rendezvous_no_employe,
+  getAllActif,
+  getRendezvousAssigne,
+  getRendezvousAssigneUpToDate,
+  getRendezvousUpToDate
 };

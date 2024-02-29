@@ -88,7 +88,7 @@ const getOfferById = () => {
                 const responseData = {
                     status: false,
                     message: err.message,
-                    details: result,
+                    details: null,
                     http_response: {
                       message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
                       code: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -101,7 +101,7 @@ const getOfferById = () => {
             const responseData = {
                 status: false,
                 message: e.message,
-                details: result,
+                details: null,
                 http_response: {
                   message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
                   code: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -280,10 +280,62 @@ const deleteOffer = () => {
     })
 }
 
+const getOfferUpToDate = () => {
+  return(async (req,res)=>{
+      try{
+          // await mongoose.connect(uri)
+          await service.getAllOffreUptoDate()
+          .then((result)=>{
+              const responseData = {
+                  status: true,
+                  message: "List offer up to date",
+                  details: result,
+                  http_response: {
+                    message: HttpStatus.getStatusText(HttpStatus.OK),
+                    code: HttpStatus.OK,
+                  },
+                };
+              // if(result.length<=0) return res.status(204).send('No match for the request')
+              return res.status(200).json(responseData)
+              
+          })
+          .catch((err) => {
+              const responseData = {
+                  status: false,
+                  message: err.message,
+                  details: null,
+                  http_response: {
+                    message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+                    code: HttpStatus.INTERNAL_SERVER_ERROR,
+                  },
+                };
+              console.log("Error : "+err.message)
+              return res.status(500).send(responseData)
+          });
+      }catch(e){
+          const responseData = {
+              status: false,
+              message: e.message,
+              details: null,
+              http_response: {
+                message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+                code: HttpStatus.INTERNAL_SERVER_ERROR,
+              },
+            };
+          console.log("Error : "+e.message)
+          // await mongoose.disconnect()
+          return res.status(500).send(responseData)
+      }finally{
+          // await mongoose.disconnect()
+      }
+  })
+}
+
 module.exports = {
     getOffer,
     getOfferById,
     createOffer,
     updateOffer,
-    deleteOffer
+    deleteOffer,
+    getOfferUpToDate
 }

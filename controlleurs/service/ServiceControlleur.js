@@ -173,9 +173,9 @@ const updateService = () => {
   return async (req, res) => {
     try {
       // await mongoose.connect(uri)
-      const { nom, prix, duree, commission } = req.body;
+      const { nom, prix, duree, commission, is_activated } = req.body;
       await service
-        .update(req.params.id, nom, prix, duree, commission)
+        .update(req.params.id, nom, prix, duree, commission, is_activated)
         .then((result) => {
           const responseData = {
             status: true,
@@ -272,10 +272,166 @@ const deleteService = () => {
   };
 };
 
+const getServiceActif = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getAllActif()
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: "List service activated",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
+const searchByName = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .searchByName(req.query.name)
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: `Service with name ${req.query.name}`,
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e.message,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
+const getAllLimit = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getAllLimit()
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: `Service limit 5`,
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e.message,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
 module.exports = {
   getService,
   getServiceById,
   createService,
   updateService,
   deleteService,
+  getServiceActif,
+  getAllLimit,
+  searchByName
 };

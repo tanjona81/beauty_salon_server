@@ -136,7 +136,16 @@ const getEmployeById = () => {
             };
             return res.status(HttpStatus.OK).json(responseData);
           }
-          return res.status(200).json(result);
+          const responseData = {
+            status: true,
+            message: "Employe found",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -201,7 +210,16 @@ const createEmploye = () => {
           heure_fin
         )
         .then((result) => {
-          return res.status(201).json(result);
+          const responseData = {
+            status: true,
+            message: "Employe created successfuly",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -251,6 +269,7 @@ const updateEmploye = () => {
         mdp,
         heure_debut,
         heure_fin,
+        is_activated
       } = req.body;
       await service
         .update(
@@ -264,15 +283,25 @@ const updateEmploye = () => {
           addresse,
           mdp,
           heure_debut,
-          heure_fin
+          heure_fin,
+          is_activated
         )
         .then((result) => {
-          return res.status(200).json(result);
+          const responseData = {
+            status: true,
+            message: "Employe updated successfuly",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
             status: false,
-            message: err,
+            message: err.message,
             details: null,
             http_response: {
               message: HttpStatus.getStatusText(
@@ -288,7 +317,7 @@ const updateEmploye = () => {
     } catch (e) {
       const responseData = {
         status: false,
-        message: e,
+        message: e.message,
         details: null,
         http_response: {
           message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
@@ -309,7 +338,16 @@ const deleteEmploye = () => {
       await service
         .delete_employe(req.params.id)
         .then((result) => {
-          return res.status(204).json("Employe deleted");
+          const responseData = {
+            status: true,
+            message: "Employe deleted successfuly",
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(204).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -362,7 +400,16 @@ const getRendezvousEmploye = () => {
             };
             return res.status(HttpStatus.OK).json(responseData);
           }
-          return res.status(200).json(result);
+          const responseData = {
+            status: true,
+            message: "List rendezvous for this employe",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -455,9 +502,28 @@ const validate_rendezvous = () => {
       await service
         .validate_rendezvous(req.params.id)
         .then((result) => {
-          if (result.length <= 0)
-            return res.status(204).send("No match for the request");
-          return res.status(200).json(result);
+          if (result.length <= 0){
+            const responseData = {
+              status: false,
+              message: "No match for the request for this id",
+              details: null,
+              http_response: {
+                message: HttpStatus.getStatusText(HttpStatus.NO_CONTENT),
+                code: HttpStatus.OK,
+              },
+            };
+            return res.status(200).json(responseData);
+          }
+          const responseData = {
+            status: true,
+            message: "Rdv Validated",
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(200).json(responseData);
         })
         .catch((err) => {
           const responseData = {
@@ -501,7 +567,7 @@ const getCommission = () => {
         .then((result) => {
           const responseData = {
             status: true,
-            message: `Commission with id ${req.params.id}`,
+            message: `Commission with id ${req.user_id}`,
             details: result,
             http_response: {
               message: HttpStatus.getStatusText(HttpStatus.OK),
@@ -565,6 +631,57 @@ const acceptRdvNoEmploye = () => {
         .catch((err) => {
           const responseData = {
             status: false,
+            message: err.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e.message,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
+const getAllActif = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getAllActif()
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: `List all activated employe`,
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
             message: err,
             details: null,
             http_response: {
@@ -595,6 +712,159 @@ const acceptRdvNoEmploye = () => {
   };
 };
 
+const getRdvAssigne = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getRendezvousAssigne(req.user_id)
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: `List rdv assigne`,
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
+const getRdvAssigneUpToDate = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getRendezvousAssigneUpToDate(req.user_id)
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: `List rdv assigne up to date`,
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e.message,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
+const getRdvUpToDate = () => {
+  return async (req, res) => {
+    try {
+      // await mongoose.connect(uri)
+      await service
+        .getRendezvousUpToDate(req.user_id)
+        .then((result) => {
+          const responseData = {
+            status: true,
+            message: `List rdv assigne up to date`,
+            details: result,
+            http_response: {
+              message: HttpStatus.getStatusText(HttpStatus.OK),
+              code: HttpStatus.OK,
+            },
+          };
+          return res.status(HttpStatus.OK).json(responseData);
+        })
+        .catch((err) => {
+          const responseData = {
+            status: false,
+            message: err.message,
+            details: null,
+            http_response: {
+              message: HttpStatus.getStatusText(
+                HttpStatus.INTERNAL_SERVER_ERROR
+              ),
+              code: HttpStatus.INTERNAL_SERVER_ERROR,
+            },
+          };
+          return res
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json(responseData);
+        });
+    } catch (e) {
+      const responseData = {
+        status: false,
+        message: e.message,
+        details: null,
+        http_response: {
+          message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR),
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+        },
+      };
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(responseData);
+    } finally {
+      // await mongoose.disconnect()
+    }
+  };
+};
+
 module.exports = {
   getEmploye,
   getEmployeById,
@@ -606,5 +876,9 @@ module.exports = {
   getDoneRendezvousEmploye,
   validate_rendezvous,
   getCommission,
-  acceptRdvNoEmploye
+  acceptRdvNoEmploye,
+  getAllActif,
+  getRdvAssigne,
+  getRdvAssigneUpToDate,
+  getRdvUpToDate
 };

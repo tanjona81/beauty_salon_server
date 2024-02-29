@@ -14,14 +14,19 @@ const getById = async (id) => {
 }
 
 const create = async (id_customer, id_service, id_employe, date_heure) =>  {
-    const employe = await Employe.findOne({_id : id_employe});
-    const service = await Service.findOne({_id : id_service})
+    const employe = await Employe.findOne({_id : id_employe, is_activated: 1});
+    const service = await Service.findOne({_id : id_service, is_activated: 1});
+
+    if(!employe || !service) return {message:`Employe or service not activated`}
 
     // Convert the date_heure parameter into Date
     const date = new Date(date_heure)
+    const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const time_date = utils.stringToTime(date.toLocaleTimeString(undefined, options)); 
 
     // date_heure + service.duree
     let date_heure_plus_duree = new Date(date.getTime() + service.duree * 60000)
+    const time_date_plus_duree = utils.stringToTime(date_heure_plus_duree.toLocaleTimeString(undefined, options)); 
 
     const time_debut = utils.stringToTime(employe.heure_debut)
     const time_fin = utils.stringToTime(employe.heure_fin)
@@ -68,8 +73,8 @@ const create = async (id_customer, id_service, id_employe, date_heure) =>  {
     ])
 
     // Check if the employe work on the parameter date
-    if(date.getTime() < time_debut.getTime() || date.getTime() > time_fin.getTime()
-        || date_heure_plus_duree.getTime() > time_fin.getTime()) 
+    if(time_date.getTime() < time_debut.getTime() || time_date.getTime() > time_fin.getTime()
+        || time_date_plus_duree.getTime() > time_fin.getTime()) 
         return {message:`${employe.nom} doesn't work on this date`}
     
     // console.log(rendezvous_valid)
@@ -117,6 +122,9 @@ const delete_rendezvous = async (id) => {
 }
 
 const create_rdv_no_employe = async (id_customer, id_service, date_heure) =>  {
+    const service = await Service.findOne({_id : id_service, is_activated: 1});
+    if(!service) return {message:`Employe or service not activated`}
+
     let rendezvous = new Rendezvous();
     rendezvous.id_customer = id_customer
     rendezvous.id_service = id_service
@@ -143,6 +151,56 @@ const get_rdv_no_employe = async () => {
     ])
 }
 
+const getAllRdvJoin = async () => {
+    return await Rendezvous.find()
+    .populate({
+        path: "id_customer"
+    })
+    .populate({
+        path: "id_service"
+    })
+    .populate({
+        path: "id_employe",
+        options: { preserveNullAndEmptyArrays: true }
+    })
+    .sort({date_heure: -1});
+}
+
+const get_rdv_no_employe_upToDate = async () => {
+    return await Rendezvous.aggregate([
+        {
+            $lookup: {
+                from: 'services',
+                localField: 'id_service',
+                foreignField: '_id',
+                as: 'services'
+            }
+        },
+        {
+            $unwind: { path: "$services" }
+        },
+        {
+            $lookup: {
+                from: 'customers',
+                localField: 'id_customer',
+                foreignField: '_id',
+                as: 'customers'
+            }
+        },
+        {
+            $unwind: { path: "$customers" }
+        },
+        {
+            $match:{
+                id_employe: { $exists: false },
+                $expr:{
+                    $gt: [{ $add: ["$date_heure", { $multiply: ["$services.duree", 60000] }] },new Date()]
+                }
+            }
+        },
+    ])
+}
+
 module.exports = {
     getAll,
     getById,
@@ -150,5 +208,7 @@ module.exports = {
     update,
     delete_rendezvous,
     create_rdv_no_employe,
-    get_rdv_no_employe
+    get_rdv_no_employe,
+    getAllRdvJoin,
+    get_rdv_no_employe_upToDate
 }
