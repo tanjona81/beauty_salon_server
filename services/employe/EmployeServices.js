@@ -8,7 +8,6 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const sendmail = require("../../Utils/Gmail.js");
 const config = require("../../config/auth.config.js");
-const stringToTime = require("../../Utils/Time.js");
 const utils = require('../../Utils/Time.js')
 
 const login = async (email, mdp) => {
