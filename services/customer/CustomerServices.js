@@ -185,7 +185,7 @@ const getNotPaid = async (id_customer) => {
     },
     {
       $lookup: {
-        from: "payment",
+        from: "payments",
         localField: "_id",
         foreignField: "id_rendezvous",
         as: "payment",
@@ -218,7 +218,9 @@ const getNotPaid = async (id_customer) => {
     },
     {
       $match: {
-        payement: { $eq: null }
+        $expr: {
+          $eq: [{ $ifNull: ["$payment", null] }, null]
+        }
       }
     },
     {
